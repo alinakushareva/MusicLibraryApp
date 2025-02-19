@@ -172,8 +172,11 @@ public class MusicStore {
      * Params: album (Album) - Album object to verify
      * Output: boolean - True if album exists, false otherwise
      */
-    public boolean albumExists(Album album) {
-        if (!albumsByTitle.containsKey(album.getTitle())) return false;
-        return albumsByArtist.get(album.getArtist()).contains(album);
+    public boolean albumExists(String title, String artist) {
+        if (!albumsByTitle.containsKey(title)) {
+            return false;
+        }
+        Album album = albumsByTitle.get(title);
+        return album.getArtist().equals(artist);
     }
 }
