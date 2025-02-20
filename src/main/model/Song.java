@@ -26,8 +26,11 @@ public class Song {
      * Output: void
      */
     public void rate(int rating) {
-        this.rating = Math.max(1, Math.min(5, rating));
-        if (this.rating == 5) markAsFavorite();
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1-5");
+        }
+        this.rating = rating;
+        if (rating == 5) markAsFavorite();
     }
     
     /* 
