@@ -39,7 +39,10 @@ public class LibraryModel {
      * Output: void  
      */  
     public void addAlbum(Album album) {  
-    	// TODO !!! 
+        if (inStore(album)) {  
+            albumLibrary.add(album);  
+            album.getSongs().forEach(this::addSong);  
+        }  
     }  
     
     /*  
@@ -60,8 +63,9 @@ public class LibraryModel {
      * Output: Playlist - The newly created playlist  
      */  
     public Playlist createPlaylist(String name) {  
-    	// TODO !!! 
-    	return null; // Temporary return to avoid errors  
+        Playlist playlist = new Playlist(name);  
+        playlists.add(playlist);  
+        return playlist;  
     }  
 
     /*  
@@ -85,8 +89,12 @@ public class LibraryModel {
      * Output: Album - Found album or null  
      */  
     public Album searchAlbumByTitle(String title) {  
-    	// TODO !!! 
-    	return null; // Temporary return to avoid errors
+        for (Album album : albumLibrary) {  
+            if (album.getTitle().equalsIgnoreCase(title)) {  
+                return album;  
+            }  
+        }  
+        return null;  
     }  
 
     /*  
@@ -104,8 +112,12 @@ public class LibraryModel {
      * Output: Playlist - Found playlist or null  
      */  
     public Playlist getPlaylistByName(String name) {  
-    	// TODO !!! 
-    	return null; // Temporary return to avoid errors  
+        for (Playlist playlist : playlists) {  
+            if (playlist.getName().equalsIgnoreCase(name)) {  
+                return playlist;  
+            }  
+        }  
+        return null;  
     }  
 
     /*  
@@ -114,8 +126,13 @@ public class LibraryModel {
      * Output: List<Album> - List of matching albums (empty if none found)  
      */  
     public List<Album> getAlbumsByGenre(String genre) {  
-    	// TODO !!! 
-    	return null; // Temporary return to avoid errors  
+        List<Album> results = new ArrayList<>();  
+        for (Album album : albumLibrary) {  
+            if (album.getGenre().equalsIgnoreCase(genre)) {  
+                results.add(album);  
+            }  
+        }  
+        return results;  
     }  
 
     /*  
@@ -150,8 +167,9 @@ public class LibraryModel {
      * Output: List<Song> - List of favorite songs (empty if none exist)  
      */  
     public List<Song> getFavoriteSongs() {  
-    	// TODO !!! 
-    	return null; // Temporary return to avoid errors  
+        return songLibrary.stream()  
+                .filter(Song::isFavorite)  
+                .collect(Collectors.toList());  
     }  
 
     // Helper Methods  
@@ -171,7 +189,6 @@ public class LibraryModel {
      * Output: boolean - True if the album exists in the store  
      */  
     private boolean inStore(Album album) {  
-    	// TODO !!! 
-    	return true; // Temporary return to avoid errors  
+        return musicStore.albumExists(album.getTitle(), album.getArtist());  
     }  
 }  
