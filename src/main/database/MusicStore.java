@@ -1,6 +1,7 @@
 package main.database;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,29 +28,117 @@ public class MusicStore {
      * Output: None (constructor)
      */
     public MusicStore(String filePath) {
-        this.basePath = filePath;
-        loadAlbums();
+        // Ensure base path ends with a separator
+        if (filePath.endsWith(File.separator)) {
+            this.basePath = filePath;
+        } else {
+            this.basePath = filePath + File.separator;
+        }
+        try {
+            loadAlbums();
+        } catch (IOException e) {
+            // Propagate the exception to the caller
+            throw new RuntimeException("Error initializing MusicStore: " + e.getMessage(), e);
+        }
     }
-    
+
     /* 
      * Loads album data from the albums.txt file and processes each album.
      * Params: None
      * Output: void
      */
-    private void loadAlbums() {
-    	
-    	// TODO here!!
+    private void loadAlbums() throws IOException {
+        File albumsFile = new File(basePath + "albums.txt");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(albumsFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 2);
+                if (parts.length != 2) {
+                    // Skip invalid entries silently
+                    continue;
+                }
+
+                String albumTitle = parts[0].trim();
+                String artist = parts[1].trim();
+                processAlbumFile(albumTitle, artist);
+            }
+        } catch (IOException e) {
+            // Propagate the exception to the caller
+            throw new IOException("Error loading albums.txt: " + e.getMessage(), e);
+        }
     }
-    
+
     /* 
      * Processes an individual album file and adds its data to the store.
      * Params: albumTitle (String), artist (String)
      * Output: void
      */
-    private void processAlbumFile(String albumTitle, String artist) {
-    	
-    	// TODO here!!
+    private void processAlbumFile(String albumTitle, String artist) throws IOException {
+        String filename = basePath + albumTitle + "_" + artist + ".txt";
+        File albumFile = new File(filename);
 
+        if (!albumFile.exists()) {
+            // Skip missing files silently
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(albumFile))) {
+            // Parse header line
+            String header = reader.readLine();
+            if (header == null) {
+                // Skip empty files silently
+                return;
+            }
+
+            String[] headerParts = header.split(",", 4);
+            if (headerParts.length != 4) {
+                // Skip invalid headers silently
+                return;
+            }
+
+            String genre = headerParts[2].trim();
+            int year;
+            try {
+                year = Integer.parseInt(headerParts[3].trim());
+            } catch (NumberFormatException e) {
+                // Skip invalid years silently
+                return;
+            }
+
+            // Create album and add to data structures
+            Album album = new Album(albumTitle, artist, genre, year);
+            albumsByTitle.put(albumTitle, album);
+
+            // Add to albumsByArtist
+            if (!albumsByArtist.containsKey(artist)) {
+                albumsByArtist.put(artist, new ArrayList<>());
+            }
+            albumsByArtist.get(artist).add(album);
+
+            genres.add(genre);
+            artists.add(artist);
+
+            // Process songs in order
+            String songTitle;
+            while ((songTitle = reader.readLine()) != null) {
+                songTitle = songTitle.trim();
+                if (!songTitle.isEmpty()) {
+                    Song song = new Song(songTitle, artist, album);
+
+                    // Add to songsByTitle
+                    if (!songsByTitle.containsKey(song.getTitle())) {
+                        songsByTitle.put(song.getTitle(), new ArrayList<>());
+                    }
+                    songsByTitle.get(song.getTitle()).add(song);
+
+                    album.addSong(song); // Ensure Album class has addSong method
+                }
+            }
+        } catch (IOException e) {
+            // Propagate the exception to the caller
+            throw new IOException("Error processing album file: " + filename, e);
+        }
     }
     
     /* 
