@@ -79,22 +79,19 @@ public class MusicStore {
         File albumFile = new File(filename);
 
         if (!albumFile.exists()) {
-            // Skip missing files silently
-            return;
+            return; // Skip missing files
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(albumFile))) {
             // Parse header line
             String header = reader.readLine();
             if (header == null) {
-                // Skip empty files silently
-                return;
+                return; // Skip empty files
             }
 
             String[] headerParts = header.split(",", 4);
             if (headerParts.length != 4) {
-                // Skip invalid headers silently
-                return;
+                return; // Skip invalid headers
             }
 
             String genre = headerParts[2].trim();
@@ -102,19 +99,19 @@ public class MusicStore {
             try {
                 year = Integer.parseInt(headerParts[3].trim());
             } catch (NumberFormatException e) {
-                // Skip invalid years silently
-                return;
+                return; // Skip invalid years
             }
 
             // Create album and add to data structures
             Album album = new Album(albumTitle, artist, genre, year);
             albumsByTitle.put(albumTitle, album);
 
-            // Add to albumsByArtist
-            if (!albumsByArtist.containsKey(artist)) {
-                albumsByArtist.put(artist, new ArrayList<>());
+            // Add to albumsByArtist (store artist name in lowercase for case-insensitive lookup)
+            String artistKey = artist.toLowerCase();
+            if (!albumsByArtist.containsKey(artistKey)) {
+                albumsByArtist.put(artistKey, new ArrayList<>());
             }
-            albumsByArtist.get(artist).add(album);
+            albumsByArtist.get(artistKey).add(album);
 
             genres.add(genre);
             artists.add(artist);
@@ -125,18 +122,16 @@ public class MusicStore {
                 songTitle = songTitle.trim();
                 if (!songTitle.isEmpty()) {
                     Song song = new Song(songTitle, artist, album);
+                    album.addSong(song); // Add songs to the album in order
 
                     // Add to songsByTitle
-                    if (!songsByTitle.containsKey(song.getTitle())) {
-                        songsByTitle.put(song.getTitle(), new ArrayList<>());
+                    if (!songsByTitle.containsKey(songTitle)) {
+                        songsByTitle.put(songTitle, new ArrayList<>());
                     }
-                    songsByTitle.get(song.getTitle()).add(song);
-
-                    album.addSong(song); // Ensure Album class has addSong method
+                    songsByTitle.get(songTitle).add(song);
                 }
             }
         } catch (IOException e) {
-            // Propagate the exception to the caller
             throw new IOException("Error processing album file: " + filename, e);
         }
     }
@@ -147,7 +142,12 @@ public class MusicStore {
      * Output: Album (or null if not found)
      */
     public Album getAlbumByTitle(String title) {
-        return albumsByTitle.get(title);
+        for (Map.Entry<String, Album> entry : albumsByTitle.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(title)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
     
     /* 
@@ -156,11 +156,8 @@ public class MusicStore {
      * Output: List<Album> - List of albums (empty if none found)
      */
     public List<Album> getAlbumsByArtist(String artist) {
-        List<Album> result = new ArrayList<>();
-        if (albumsByArtist.containsKey(artist)) {
-            result.addAll(albumsByArtist.get(artist));
-        }
-        return result;
+        String artistKey = artist.toLowerCase();
+        return albumsByArtist.getOrDefault(artistKey, new ArrayList<>());
     }
     
     /* 
@@ -202,8 +199,10 @@ public class MusicStore {
      */
     public List<Song> getSongsByTitle(String title) {
         List<Song> result = new ArrayList<>();
-        if (songsByTitle.containsKey(title)) {
-            result.addAll(songsByTitle.get(title));
+        for (Map.Entry<String, List<Song>> entry : songsByTitle.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(title)) {
+                result.addAll(entry.getValue());
+            }
         }
         return result;
     }
@@ -215,11 +214,10 @@ public class MusicStore {
      */
     public List<Song> getSongsByArtist(String artist) {
         List<Song> result = new ArrayList<>();
-        for (List<Song> songList : songsByTitle.values()) {
-            for (Song song : songList) {
-                if (song.getArtist().equals(artist)) {
-                    result.add(song);
-                }
+        String artistKey = artist.toLowerCase();
+        if (albumsByArtist.containsKey(artistKey)) {
+            for (Album album : albumsByArtist.get(artistKey)) {
+                result.addAll(album.getSongs()); // Songs are already in order
             }
         }
         return result;
@@ -234,7 +232,7 @@ public class MusicStore {
     public Song getSongByArtistAndTitle(String artist, String title) {
         List<Song> songs = getSongsByTitle(title);
         for (Song song : songs) {
-            if (song.getArtist().equals(artist)) {
+            if (song.getArtist().equalsIgnoreCase(artist)) {
                 return song;
             }
         }
@@ -266,6 +264,6 @@ public class MusicStore {
             return false;
         }
         Album album = albumsByTitle.get(title);
-        return album.getArtist().equals(artist);
+        return album.getArtist().equalsIgnoreCase(artist);
     }
 }
