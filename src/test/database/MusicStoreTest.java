@@ -65,13 +65,6 @@ class MusicStoreTest {
     }
 
     @Test
-    void testGetAlbumsByGenreInvalid() {
-        MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
-        List<Album> albums = store.getAlbumsByGenre("Nonexistent Genre");
-        assertTrue(albums.isEmpty());
-    }
-
-    @Test
     void testGetSongsByTitleValid() {
         MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
         List<Song> songs = store.getSongsByTitle("Clocks");
@@ -121,23 +114,9 @@ class MusicStoreTest {
     }
 
     @Test
-    void testGetSongsByGenreValid() {
-        MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
-        List<Song> songs = store.getSongsByGenre("Alternative");
-        assertFalse(songs.isEmpty(), "Genre with songs should return non-empty list");
-    }
-
-    @Test
-    void testGetSongsByGenreInvalid() {
-        MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
-        List<Song> songs = store.getSongsByGenre("Nonexistent Genre");
-        assertTrue(songs.isEmpty(), "Invalid genre should return empty list");
-    }
-
-    @Test
     void testAlbumExistsValid() {
         MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
-        assertTrue(store.albumExists("A Rush of Blood to the Head", "Coldplay"), "Existing album should return true");
+        assertTrue(store.albumExists("A Rush of Blood to the Head", "Coldplay"));
     }
 
     @Test
@@ -149,6 +128,6 @@ class MusicStoreTest {
     @Test
     void testAlbumExistsInvalidArtist() {
         MusicStore store = new MusicStore(TEST_ALBUMS_PATH);
-        assertFalse(store.albumExists("A Rush of Blood to the Head", "Invalid Artist"), "Invalid artist should return false");
+        assertFalse(store.albumExists("A Rush of Blood to the Head", "Invalid Artist"));
     }
 }

@@ -1,61 +1,52 @@
 package main.database;
 
+import main.model.Album;
+import main.model.Song;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import main.model.Album;
-import main.model.Song;
 
 public class MusicStore {
-	private final Map<String, Album> albumsByTitle = new HashMap<>();
+    private final Map<String, Album> albumsByTitle = new HashMap<>();
     private final Map<String, List<Album>> albumsByArtist = new HashMap<>();
     private final Map<String, List<Song>> songsByTitle = new HashMap<>();
-    private final Set<String> genres = new HashSet<>();
-    private final Set<String> artists = new HashSet<>();
     private final String basePath;
-    
-    /* 
-     * Constructor: Initializes the music store and loads album data.
-     * Params: filePath (String) - Path to the directory containing album files
-     * Output: None (constructor)
+
+    /**
+     * Constructs a MusicStore instance and initializes it with album data.
+     * 
+     * @param filePath The directory path containing album files.
+     * @throws RuntimeException If an error occurs during initialization.
      */
     public MusicStore(String filePath) {
-        // Ensure base path ends with a separator
+        // Making sure the base path ends with a separator
         if (filePath.endsWith(File.separator)) {
             this.basePath = filePath;
         } else {
             this.basePath = filePath + File.separator;
         }
-        try {
-            loadAlbums();
-        } catch (IOException e) {
-            // Propagate the exception to the caller
-            throw new RuntimeException("Error initializing MusicStore: " + e.getMessage(), e);
-        }
+        initializeStore();
     }
 
-    /* 
-     * Loads album data from the albums.txt file and processes each album.
-     * Params: None
-     * Output: void
+    /**
+     * Initializes the music store by loading album data from files.
      */
-    private void loadAlbums() throws IOException {
+    private void initializeStore() {
         File albumsFile = new File(basePath + "albums.txt");
 
         try (BufferedReader reader = new BufferedReader(new FileReader(albumsFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                // Splitting the line into album title and artist
                 String[] parts = line.split(",", 2);
                 if (parts.length != 2) {
-                    // Skip invalid entries silently
+                    // Skipping invalid entries
                     continue;
                 }
 
@@ -64,34 +55,35 @@ public class MusicStore {
                 processAlbumFile(albumTitle, artist);
             }
         } catch (IOException e) {
-            // Propagate the exception to the caller
-            throw new IOException("Error loading albums.txt: " + e.getMessage(), e);
+            throw new RuntimeException("Error loading albums.txt: " + e.getMessage(), e);
         }
     }
 
-    /* 
+    /**
      * Processes an individual album file and adds its data to the store.
-     * Params: albumTitle (String), artist (String)
-     * Output: void
+     * 
+     * @param albumTitle The title of the album.
+     * @param artist The artist of the album.
      */
-    private void processAlbumFile(String albumTitle, String artist) throws IOException {
+    private void processAlbumFile(String albumTitle, String artist) {
         String filename = basePath + albumTitle + "_" + artist + ".txt";
         File albumFile = new File(filename);
 
         if (!albumFile.exists()) {
-            return; // Skip missing files
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(albumFile))) {
-            // Parse header line
+            // Parsing header line
             String header = reader.readLine();
             if (header == null) {
-                return; // Skip empty files
+                return;
             }
 
+            // Splitting header into parts: title, artist, genre, year
             String[] headerParts = header.split(",", 4);
             if (headerParts.length != 4) {
-                return; // Skip invalid headers
+                return; 
             }
 
             String genre = headerParts[2].trim();
@@ -99,123 +91,109 @@ public class MusicStore {
             try {
                 year = Integer.parseInt(headerParts[3].trim());
             } catch (NumberFormatException e) {
-                return; // Skip invalid years
+                return; 
             }
 
-            // Create album and add to data structures
+            // Creating album and adding to data structures
             Album album = new Album(albumTitle, artist, genre, year);
-            albumsByTitle.put(albumTitle, album);
+            albumsByTitle.put(albumTitle.toLowerCase(), album);
 
-            // Add to albumsByArtist (store artist name in lowercase for case-insensitive lookup)
+            // Adding to albumsByArtist 
             String artistKey = artist.toLowerCase();
             if (!albumsByArtist.containsKey(artistKey)) {
                 albumsByArtist.put(artistKey, new ArrayList<>());
             }
             albumsByArtist.get(artistKey).add(album);
 
-            genres.add(genre);
-            artists.add(artist);
-
-            // Process songs in order
+            // Processing songs in order
             String songTitle;
             while ((songTitle = reader.readLine()) != null) {
                 songTitle = songTitle.trim();
                 if (!songTitle.isEmpty()) {
                     Song song = new Song(songTitle, artist, album);
-                    album.addSong(song); // Add songs to the album in order
+                    album.addSong(song); // Adding songs to the album in order
 
-                    // Add to songsByTitle
-                    if (!songsByTitle.containsKey(songTitle)) {
-                        songsByTitle.put(songTitle, new ArrayList<>());
+                    // Adding to songsByTitle 
+                    String songTitleKey = songTitle.toLowerCase();
+                    if (!songsByTitle.containsKey(songTitleKey)) {
+                        songsByTitle.put(songTitleKey, new ArrayList<>());
                     }
-                    songsByTitle.get(songTitle).add(song);
+                    songsByTitle.get(songTitleKey).add(song);
                 }
             }
         } catch (IOException e) {
-            throw new IOException("Error processing album file: " + filename, e);
+            throw new RuntimeException("Error processing album file: " + filename, e);
         }
     }
-    
-    /* 
-     * Retrieves an album by its exact title.
-     * Params: title (String) - Album title to search for
-     * Output: Album (or null if not found)
+
+    // ================== PUBLIC METHODS ================== //
+
+    /**
+     * Retrieves an album by its exact title (case-insensitive).
+     * 
+     * @param title The title of the album to search for.
+     * @return The album, or null if not found.
      */
     public Album getAlbumByTitle(String title) {
-        for (Map.Entry<String, Album> entry : albumsByTitle.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(title)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return albumsByTitle.get(title.toLowerCase());
     }
-    
-    /* 
-     * Returns all albums by a specific artist
-     * Params: artist (String) - Artist name to search for
-     * Output: List<Album> - List of albums (empty if none found)
+
+    /**
+     * Retrieves all albums by a specific artist (case-insensitive).
+     * 
+     * @param artist The artist name to search for.
+     * @return An unmodifiable list of albums (empty if none found).
      */
     public List<Album> getAlbumsByArtist(String artist) {
         String artistKey = artist.toLowerCase();
-        return albumsByArtist.getOrDefault(artistKey, new ArrayList<>());
-    }
-    
-    /* 
-     * Finds a specific album by artist and title combination
-     * Params: artist (String) - Artist name to search for
-     *         title (String) - Album title to search for
-     * Output: Album - Found album or null
-     */
-    public Album getAlbumByArtistAndTitle(String artist, String title) {
-        if (!albumsByArtist.containsKey(artist)) return null;
-        
-        for (Album album : albumsByArtist.get(artist)) {
-            if (album.getTitle().equals(title)) {
-                return album;
-            }
+        if (albumsByArtist.containsKey(artistKey)) {
+            return Collections.unmodifiableList(albumsByArtist.get(artistKey));
         }
-        return null;
-    } 
-    
-    /* 
-     * Retrieves all songs with a specific title
-     * Params: title (String) - Song title to search for
-     * Output: List<Song> - List of songs (empty if none found)
+        return Collections.emptyList();
+    }
+
+    /**
+     * Retrieves all songs with a specific title (case-insensitive).
+     * 
+     * @param title The title to search for.
+     * @return An unmodifiable list of songs (empty if none found).
      */
     public List<Song> getSongsByTitle(String title) {
-        List<Song> result = new ArrayList<>();
-        for (Map.Entry<String, List<Song>> entry : songsByTitle.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(title)) {
-                result.addAll(entry.getValue());
-            }
+        String titleKey = title.toLowerCase();
+        if (songsByTitle.containsKey(titleKey)) {
+            return Collections.unmodifiableList(songsByTitle.get(titleKey));
         }
-        return result;
+        return Collections.emptyList();
     }
-    
-    /* 
-     * Returns all songs by a specific artist
-     * Params: artist (String) - Artist name to filter by
-     * Output: List<Song> - List of songs (empty if none found)
+
+    /**
+     * Retrieves all songs by a specific artist (case-insensitive).
+     * 
+     * @param artist The artist name to search for.
+     * @return An unmodifiable list of songs (empty if none found).
      */
     public List<Song> getSongsByArtist(String artist) {
         List<Song> result = new ArrayList<>();
         String artistKey = artist.toLowerCase();
         if (albumsByArtist.containsKey(artistKey)) {
+            // Iterating through all albums by the artist and collect songs
             for (Album album : albumsByArtist.get(artistKey)) {
-                result.addAll(album.getSongs()); // Songs are already in order
+                result.addAll(album.getSongs());
             }
         }
-        return result;
+        return Collections.unmodifiableList(result);
     }
-    
-    /* 
-     * Finds a specific song by artist and title combination
-     * Params: artist (String) - Artist name to search for
-     *         title (String) - Song title to search for
-     * Output: Song - Found song or null
+
+    /**
+     * Retrieves a specific song by artist and title (case-insensitive).
+     * 
+     * @param artist The artist name to search for.
+     * @param title  The song title to search for.
+     * @return The song, or null if not found.
      */
     public Song getSongByArtistAndTitle(String artist, String title) {
         List<Song> songs = getSongsByTitle(title);
+        // Iterating through songs to find a match with the artist
         for (Song song : songs) {
             if (song.getArtist().equalsIgnoreCase(artist)) {
                 return song;
@@ -224,17 +202,33 @@ public class MusicStore {
         return null;
     }
 
-    
-    /* 
-     * Checks if an album exists in the music store
-     * Params: album (Album) - Album object to verify
-     * Output: boolean - True if album exists, false otherwise
+    /**
+     * Checks if an album exists in the store (case-insensitive).
+     * 
+     * @param title  The title of the album.
+     * @param artist The artist of the album.
+     * @return True if the album exists, false otherwise.
      */
     public boolean albumExists(String title, String artist) {
-        if (!albumsByTitle.containsKey(title)) {
-            return false;
+        Album album = albumsByTitle.get(title.toLowerCase());
+        return album != null && album.getArtist().equalsIgnoreCase(artist);
+    }
+
+    /**
+     * Retrieves an album by artist and title combination (case-insensitive).
+     * 
+     * @param artist The artist name to search for.
+     * @param title  The title of the album to search for.
+     * @return The album, or null if not found.
+     */
+    public Album getAlbumByArtistAndTitle(String artist, String title) {
+        List<Album> albums = getAlbumsByArtist(artist);
+        // Iterating through albums to find a match with the title
+        for (Album album : albums) {
+            if (album.getTitle().equalsIgnoreCase(title)) {
+                return album;
+            }
         }
-        Album album = albumsByTitle.get(title);
-        return album.getArtist().equalsIgnoreCase(artist);
+        return null;
     }
 }
