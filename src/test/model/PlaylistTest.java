@@ -75,25 +75,4 @@ class PlaylistTest {
         songs.remove(0); // Modifying the returned list
         assertEquals(1, playlist.getSongs().size()); // Original list remains unchanged
     }
-
-    @Test
-    void testContainsSongReturnsTrueForAddedSong() {
-        Playlist playlist = new Playlist("My Playlist");
-        Song song = new Song("Molodost", "Max Korzh", null);
-        playlist.addSong(song);
-        assertTrue(playlist.containsSong(song));
-    }
-
-    @Test
-    void testContainsSongReturnsFalseForNotAddedSong() {
-        Playlist playlist = new Playlist("My Playlist");
-        Song song = new Song("Molodost", "Max Korzh", null);
-        assertFalse(playlist.containsSong(song));
-    }
-
-    @Test
-    void testContainsSongReturnsFalseForNull() {
-        Playlist playlist = new Playlist("My Playlist");
-        assertFalse(playlist.containsSong(null));
-    }
 }

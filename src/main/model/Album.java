@@ -16,6 +16,7 @@ public class Album {
      *         artist (String) - Album artist
      *         genre (String) - Music genre
      *         year (int) - Release year
+     * @pre title != null && artist != null && genre != null & year != 0
      * Output: None (constructor)
      */
     public Album(String title, String artist, String genre, int year) {
@@ -34,7 +35,9 @@ public class Album {
         songs.add(song);
     }
     
-    // Getters
+    
+    // ================== GETTERS ================== //
+
     public String getTitle() { 
     	return title; 
     }
