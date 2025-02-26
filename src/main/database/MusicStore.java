@@ -175,22 +175,7 @@ public class MusicStore {
             }
         }
         return null;
-    }
-    
-    /* 
-     * Returns all albums in a specific genre
-     * Params: genre (String) - Genre to filter by
-     * Output: List<Album> - List of albums (empty if none found)
-     */
-    public List<Album> getAlbumsByGenre(String genre) {
-        List<Album> result = new ArrayList<>();
-        for (Album album : albumsByTitle.values()) {
-            if (album.getGenre().equals(genre)) {
-                result.add(album);
-            }
-        }
-        return result;
-    }
+    } 
     
     /* 
      * Retrieves all songs with a specific title
@@ -238,21 +223,7 @@ public class MusicStore {
         }
         return null;
     }
-    
-    /* 
-     * Retrieves all songs in a specific genre.
-     * Params: genre (String) - Genre to filter by (e.g., "Pop", "Rock")
-     * Output: List<Song> - List of songs in the specified genre (empty if none found)
-     */
-    public List<Song> getSongsByGenre(String genre) {
-        List<Song> result = new ArrayList<>();
-        for (Album album : albumsByTitle.values()) {
-            if (album.getGenre().equalsIgnoreCase(genre)) {
-                result.addAll(album.getSongs());
-            }
-        }
-        return result;
-    }
+
     
     /* 
      * Checks if an album exists in the music store
