@@ -3,6 +3,7 @@ package test.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,8 @@ import main.model.Song;
 
 class LibraryModelTest {
 
-    // Test adding a song that exists in the MusicStore
+    // ================== SONG/ALBUM ADDITION & REMOVAL ================== //
+
     @Test
     void testAddSongExistsInStore() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -27,7 +29,6 @@ class LibraryModelTest {
         assertEquals(1, foundSongs.size());
     }
 
-    // Test adding a song that does NOT exist in the MusicStore
     @Test
     void testAddSongNotInStore() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -40,7 +41,6 @@ class LibraryModelTest {
         assertEquals(0, foundSongs.size());
     }
 
-    // Test adding an album that exists in the MusicStore
     @Test
     void testAddAlbumExistsInStore() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -53,7 +53,6 @@ class LibraryModelTest {
         assertNotNull(foundAlbum);
     }
 
-    // Test adding an album that does NOT exist in the MusicStore
     @Test
     void testAddAlbumNotInStore() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -66,7 +65,34 @@ class LibraryModelTest {
         assertNull(foundAlbum);
     }
 
-    // Test searching for a song that exists in the library
+    @Test
+    void testRemoveSong() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
+        libraryModel.addSong(song);
+        libraryModel.removeSong(song);
+
+        List<Song> foundSongs = libraryModel.searchSongByTitle("Clocks");
+        assertEquals(0, foundSongs.size());
+    }
+
+    @Test
+    void testRemoveAlbum() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("A Rush of Blood to the Head");
+        libraryModel.addAlbum(album);
+        libraryModel.removeAlbum(album);
+
+        Album foundAlbum = libraryModel.searchAlbumByTitle("A Rush of Blood to the Head");
+        assertNull(foundAlbum);
+    }
+
+    // ================== SEARCH METHODS (LIBRARY) ================== //
+
     @Test
     void testSearchSongByTitleExists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -79,7 +105,6 @@ class LibraryModelTest {
         assertEquals(1, foundSongs.size());
     }
 
-    // Test searching for a song that does NOT exist in the library
     @Test
     void testSearchSongByTitleNotExists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -89,7 +114,27 @@ class LibraryModelTest {
         assertEquals(0, foundSongs.size());
     }
 
-    // Test searching for an album that exists in the library
+    @Test
+    void testSearchSongByArtistExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
+        libraryModel.addSong(song);
+
+        List<Song> foundSongs = libraryModel.searchSongByArtist("Coldplay");
+        assertEquals(1, foundSongs.size());
+    }
+
+    @Test
+    void testSearchSongByArtistNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> foundSongs = libraryModel.searchSongByArtist("Unknown Artist");
+        assertEquals(0, foundSongs.size());
+    }
+
     @Test
     void testSearchAlbumByTitleExists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -102,7 +147,6 @@ class LibraryModelTest {
         assertNotNull(foundAlbum);
     }
 
-    // Test searching for an album that does NOT exist in the library
     @Test
     void testSearchAlbumByTitleNotExists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -112,7 +156,124 @@ class LibraryModelTest {
         assertNull(foundAlbum);
     }
 
-    // Test creating a playlist
+    @Test
+    void testSearchAlbumByArtistExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("A Rush of Blood to the Head");
+        libraryModel.addAlbum(album);
+
+        List<Album> foundAlbums = libraryModel.searchAlbumByArtist("Coldplay");
+        assertEquals(1, foundAlbums.size());
+    }
+
+    @Test
+    void testSearchAlbumByArtistNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Album> foundAlbums = libraryModel.searchAlbumByArtist("Unknown Artist");
+        assertEquals(0, foundAlbums.size());
+    }
+
+    @Test
+    void testSearchSongByArtistAndTitleExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
+        libraryModel.addSong(song);
+
+        Song foundSong = libraryModel.searchSongByArtistAndTitle("Coldplay", "Clocks");
+        assertNotNull(foundSong);
+    }
+
+    @Test
+    void testSearchSongByArtistAndTitleNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song foundSong = libraryModel.searchSongByArtistAndTitle("Unknown Artist", "Nonexistent Song");
+        assertNull(foundSong);
+    }
+
+    // ================== SEARCH METHODS (MUSIC STORE) ================== //
+
+    @Test
+    void testSearchStoreSongByTitleExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> foundSongs = libraryModel.searchStoreSongByTitle("Clocks");
+        assertFalse(foundSongs.isEmpty());
+    }
+
+    @Test
+    void testSearchStoreSongByTitleNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> foundSongs = libraryModel.searchStoreSongByTitle("Nonexistent Song");
+        assertTrue(foundSongs.isEmpty());
+    }
+
+    @Test
+    void testSearchStoreSongByArtistExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> foundSongs = libraryModel.searchStoreSongByArtist("Coldplay");
+        assertFalse(foundSongs.isEmpty());
+    }
+
+    @Test
+    void testSearchStoreSongByArtistNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> foundSongs = libraryModel.searchStoreSongByArtist("Unknown Artist");
+        assertTrue(foundSongs.isEmpty());
+    }
+
+    @Test
+    void testSearchStoreAlbumByTitleExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album foundAlbum = libraryModel.searchStoreAlbumByTitle("A Rush of Blood to the Head");
+        assertNotNull(foundAlbum);
+    }
+
+    @Test
+    void testSearchStoreAlbumByTitleNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album foundAlbum = libraryModel.searchStoreAlbumByTitle("Nonexistent Album");
+        assertNull(foundAlbum);
+    }
+
+    @Test
+    void testSearchStoreAlbumByArtistExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Album> foundAlbums = libraryModel.searchStoreAlbumByArtist("Coldplay");
+        assertFalse(foundAlbums.isEmpty());
+    }
+
+    @Test
+    void testSearchStoreAlbumByArtistNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Album> foundAlbums = libraryModel.searchStoreAlbumByArtist("Unknown Artist");
+        assertTrue(foundAlbums.isEmpty());
+    }
+
+    // ================== PLAYLIST MANAGEMENT ================== //
+
     @Test
     void testCreatePlaylist() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -122,36 +283,42 @@ class LibraryModelTest {
         assertNotNull(playlist);
     }
 
-    // Test adding a song to a playlist
     @Test
-    void testAddSongToPlaylist() {
+    void testGetPlaylists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
-        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
-        Playlist playlist = libraryModel.createPlaylist("My Playlist");
-        playlist.addSong(song);
+        libraryModel.createPlaylist("Playlist 1");
+        libraryModel.createPlaylist("Playlist 2");
 
-        assertEquals(1, playlist.getSongs().size());
+        List<Playlist> playlists = libraryModel.getPlaylists();
+        assertEquals(2, playlists.size());
     }
 
-    // Test removing a song from a playlist
     @Test
-    void testRemoveSongFromPlaylist() {
+    void testGetPlaylistByNameExists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
-        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
-        Playlist playlist = libraryModel.createPlaylist("My Playlist");
-        playlist.addSong(song);
-        playlist.removeSong(song);
+        libraryModel.createPlaylist("My Playlist");
 
-        assertEquals(0, playlist.getSongs().size());
+        Playlist foundPlaylist = libraryModel.getPlaylistByName("My Playlist");
+        assertNotNull(foundPlaylist);
     }
 
-    // Test rating a song and marking it as a favorite
     @Test
-    void testRateSongAndMarkAsFavorite() {
+    void testGetPlaylistByNameNotExists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Playlist foundPlaylist = libraryModel.getPlaylistByName("Nonexistent Playlist");
+        assertNull(foundPlaylist);
+    }
+
+    // ================== RATING & FAVORITES ================== //
+
+    @Test
+    void testRateSongValid() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
@@ -162,7 +329,28 @@ class LibraryModelTest {
         assertTrue(song.isFavorite());
     }
 
-    // Test getting all favorite songs
+    @Test
+    void testRateSongInvalidRatingLessThan1() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
+        libraryModel.addSong(song);
+
+        assertThrows(IllegalArgumentException.class, () -> libraryModel.rateSong(song, 0));
+    }
+
+    @Test
+    void testRateSongInvalidRatingGreaterThan5() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
+        libraryModel.addSong(song);
+
+        assertThrows(IllegalArgumentException.class, () -> libraryModel.rateSong(song, 6));
+    }
+
     @Test
     void testGetFavoriteSongs() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -176,20 +364,8 @@ class LibraryModelTest {
         assertEquals(1, favoriteSongs.size());
     }
 
-    // Test getting albums by genre
-    @Test
-    void testGetAlbumsByGenre() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
+    // ================== HELPER METHODS ================== //
 
-        Album album = musicStore.getAlbumByTitle("A Rush of Blood to the Head");
-        libraryModel.addAlbum(album);
-
-        List<Album> albums = libraryModel.getAlbumsByGenre("Alternative");
-        assertEquals(1, albums.size());
-    }
-
-    // Test getting all artists in the library
     @Test
     void testGetArtists() {
         MusicStore musicStore = new MusicStore("src/main/albums");
@@ -202,107 +378,46 @@ class LibraryModelTest {
         assertEquals(1, artists.size());
     }
     
-    
- // Test removing a song from a playlist (null playlist or song)
+ // ================== GETTERS ================== //
+
     @Test
-    void testRemoveSongFromPlaylistNullInput() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
-
-        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
-        Playlist playlist = libraryModel.createPlaylist("My Playlist");
-
-        // Test null playlist
-        libraryModel.removeSongFromPlaylist(null, song);
-        assertEquals(0, playlist.getSongs().size());
-
-        // Test null song
-        libraryModel.removeSongFromPlaylist(playlist, null);
-        assertEquals(0, playlist.getSongs().size());
-    }
-
-    // Test searching for a song by title (case-insensitive)
-    @Test
-    void testSearchSongByTitleCaseInsensitive() {
+    void testGetSongLibrary() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
         Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
         libraryModel.addSong(song);
 
-        List<Song> foundSongs = libraryModel.searchSongByTitle("CLOCKS"); // Uppercase search
-        assertEquals(1, foundSongs.size());
+        Set<Song> songLibrary = libraryModel.getSongLibrary();
+
+        assertEquals(1, songLibrary.size());
+        assertTrue(songLibrary.contains(song));
+
+        assertThrows(UnsupportedOperationException.class, () -> songLibrary.add(new Song("New Song", "New Artist", null)));
     }
 
-    // Test searching for an album by title (case-insensitive)
     @Test
-    void testSearchAlbumByTitleCaseInsensitive() {
+    void testGetAlbumLibrary() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
         Album album = musicStore.getAlbumByTitle("A Rush of Blood to the Head");
         libraryModel.addAlbum(album);
 
-        Album foundAlbum = libraryModel.searchAlbumByTitle("A RUSH OF BLOOD TO THE HEAD"); // Uppercase search
-        assertNotNull(foundAlbum);
+        Set<Album> albumLibrary = libraryModel.getAlbumLibrary();
+
+        assertEquals(1, albumLibrary.size());
+        assertTrue(albumLibrary.contains(album));
+
+        assertThrows(UnsupportedOperationException.class, () -> albumLibrary.add(new Album("New Album", "New Artist", "New Genre", 2023)));
     }
 
-    // Test getting all playlists
     @Test
-    void testGetPlaylists() {
+    void testGetMusicStore() {
         MusicStore musicStore = new MusicStore("src/main/albums");
         LibraryModel libraryModel = new LibraryModel(musicStore);
 
-        libraryModel.createPlaylist("Playlist 1");
-        libraryModel.createPlaylist("Playlist 2");
-
-        List<Playlist> playlists = libraryModel.getPlaylists();
-        assertEquals(2, playlists.size());
-    }
-
-    // Test getting a playlist by name (case-insensitive)
-    @Test
-    void testGetPlaylistByNameCaseInsensitive() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
-
-        libraryModel.createPlaylist("My Playlist");
-
-        Playlist foundPlaylist = libraryModel.getPlaylistByName("MY PLAYLIST"); // Uppercase search
-        assertNotNull(foundPlaylist);
-    }
-
-    // Test getting a playlist by name that does NOT exist
-    @Test
-    void testGetPlaylistByNameNotExists() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
-
-        Playlist foundPlaylist = libraryModel.getPlaylistByName("Nonexistent Playlist");
-        assertNull(foundPlaylist);
-    }
-
-    // Test rating a song with an invalid rating (less than 1)
-    @Test
-    void testRateSongInvalidRatingLessThan1() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
-
-        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
-        libraryModel.addSong(song);
-
-        assertThrows(IllegalArgumentException.class, () -> libraryModel.rateSong(song, 0));
-    }
-
-    // Test rating a song with an invalid rating (greater than 5)
-    @Test
-    void testRateSongInvalidRatingGreaterThan5() {
-        MusicStore musicStore = new MusicStore("src/main/albums");
-        LibraryModel libraryModel = new LibraryModel(musicStore);
-
-        Song song = musicStore.getSongByArtistAndTitle("Coldplay", "Clocks");
-        libraryModel.addSong(song);
-
-        assertThrows(IllegalArgumentException.class, () -> libraryModel.rateSong(song, 6));
+        MusicStore retrievedMusicStore = libraryModel.getMusicStore();
+        assertSame(musicStore, retrievedMusicStore);
     }
 }

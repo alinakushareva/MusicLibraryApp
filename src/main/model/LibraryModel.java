@@ -2,7 +2,6 @@ package main.model;
 
 import main.database.MusicStore;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class LibraryModel {
     private final Set<Song> songLibrary = new HashSet<>();
@@ -11,25 +10,30 @@ public class LibraryModel {
     private final MusicStore musicStore;
 
     /**
-     * Constructor: Initializes the model with a reference to the MusicStore.
-     * @param musicStore The music store to validate songs/albums against.
+     * Constructs a LibraryModel with a reference to the MusicStore.
+     * 
+     * @param musicStore The MusicStore instance providing access to available music data.
      */
     public LibraryModel(MusicStore musicStore) {
         this.musicStore = musicStore;
     }
 
     /**
-     * Provides access to the MusicStore for validation purposes.
-     * @return The MusicStore instance associated with this library.
+     * Retrieves the MusicStore associated with this library model.
+     * 
+     * @return The MusicStore instance.
      */
     public MusicStore getMusicStore() {
         return this.musicStore;
     }
 
+    
     // ================== LIBRARY MANAGEMENT ================== //
 
+    
     /**
-     * Adds a song to the user's library if it exists in the MusicStore.
+     * Adds a song to the library if it exists in the MusicStore.
+     * 
      * @param song The song to add.
      */
     public void addSong(Song song) {
@@ -39,137 +43,197 @@ public class LibraryModel {
     }
 
     /**
-     * Adds an album to the user's library if it exists in the MusicStore.
+     * Removes a song from the library.
+     * 
+     * @param song The song to remove.
+     */
+    public void removeSong(Song song) {
+        songLibrary.remove(song);
+    }
+
+    /**
+     * Adds an album to the library and all its songs if the album exists in the MusicStore.
+     * 
      * @param album The album to add.
      */
     public void addAlbum(Album album) {
         if (inStore(album)) {
             albumLibrary.add(album);
-            album.getSongs().forEach(this::addSong);
+            // Add all songs from the album to the song library
+            for (Song song : album.getSongs()) {
+                addSong(song);
+            }
         }
     }
 
     /**
-     * Returns all songs in the user's library.
-     * @return A set of songs in the library.
+     * Removes an album from the library and all its songs.
+     * 
+     * @param album The album to remove.
+     */
+    public void removeAlbum(Album album) {
+        albumLibrary.remove(album);
+        // Remove all songs from the album from the song library
+        for (Song song : album.getSongs()) {
+            removeSong(song);
+        }
+    }
+
+    /**
+     * Returns an unmodifiable view of the songs in the library.
+     * 
+     * @return A set of songs.
      */
     public Set<Song> getSongLibrary() {
         return Collections.unmodifiableSet(songLibrary);
     }
 
     /**
-     * Returns all albums in the user's library.
-     * @return A set of albums in the library.
+     * Returns an unmodifiable view of the albums in the library.
+     * 
+     * @return A set of albums.
      */
     public Set<Album> getAlbumLibrary() {
         return Collections.unmodifiableSet(albumLibrary);
     }
 
+    
     // ================== SEARCH METHODS (LIBRARY) ================== //
 
+    
     /**
-     * Searches for songs in the user's library by title (case-insensitive).
+     * Searches for songs in the library by title (case-insensitive).
+     * 
      * @param title The title to search for.
-     * @return A list of matching songs (empty if none found).
+     * @return A list of matching songs.
      */
     public List<Song> searchSongByTitle(String title) {
-        return songLibrary.stream()
-            .filter(song -> song.getTitle().equalsIgnoreCase(title))
-            .collect(Collectors.toList());
+        List<Song> result = new ArrayList<>();
+        for (Song song : songLibrary) {
+            if (song.getTitle().equalsIgnoreCase(title)) {
+                result.add(song);
+            }
+        }
+        return result;
     }
 
     /**
-     * Searches for songs in the user's library by artist (case-insensitive).
+     * Searches for songs in the library by artist (case-insensitive).
+     * 
      * @param artist The artist to search for.
-     * @return A list of matching songs (empty if none found).
+     * @return A list of matching songs.
      */
     public List<Song> searchSongByArtist(String artist) {
-        return songLibrary.stream()
-            .filter(song -> song.getArtist().equalsIgnoreCase(artist))
-            .collect(Collectors.toList());
+        List<Song> result = new ArrayList<>();
+        for (Song song : songLibrary) {
+            if (song.getArtist().equalsIgnoreCase(artist)) {
+                result.add(song);
+            }
+        }
+        return result;
     }
 
     /**
-     * Searches for an album in the user's library by title (case-insensitive).
+     * Searches for an album in the library by title (case-insensitive).
+     * 
      * @param title The title to search for.
-     * @return The matching album or null.
+     * @return The matching album, or null if not found.
      */
     public Album searchAlbumByTitle(String title) {
-        return albumLibrary.stream()
-            .filter(album -> album.getTitle().equalsIgnoreCase(title))
-            .findFirst()
-            .orElse(null);
+        for (Album album : albumLibrary) {
+            if (album.getTitle().equalsIgnoreCase(title)) {
+                return album;
+            }
+        }
+        return null;
     }
 
     /**
-     * Searches for albums in the user's library by artist (case-insensitive).
+     * Searches for albums in the library by artist (case-insensitive).
+     * 
      * @param artist The artist to search for.
-     * @return A list of matching albums (empty if none found).
+     * @return A list of matching albums.
      */
     public List<Album> searchAlbumByArtist(String artist) {
-        return albumLibrary.stream()
-            .filter(album -> album.getArtist().equalsIgnoreCase(artist))
-            .collect(Collectors.toList());
+        List<Album> result = new ArrayList<>();
+        for (Album album : albumLibrary) {
+            if (album.getArtist().equalsIgnoreCase(artist)) {
+                result.add(album);
+            }
+        }
+        return result;
     }
 
     /**
-     * Searches for a specific song in the user's library by artist and title (case-insensitive).
+     * Searches for a song in the library by artist and title (case-insensitive).
+     * 
      * @param artist The artist to search for.
-     * @param title The title to search for.
-     * @return The matching song or null.
+     * @param title  The title to search for.
+     * @return The matching song, or null if not found.
      */
     public Song searchSongByArtistAndTitle(String artist, String title) {
-        return songLibrary.stream()
-            .filter(song -> song.getArtist().equalsIgnoreCase(artist) 
-                         && song.getTitle().equalsIgnoreCase(title))
-            .findFirst()
-            .orElse(null);
+        for (Song song : songLibrary) {
+            if (song.getArtist().equalsIgnoreCase(artist) 
+                && song.getTitle().equalsIgnoreCase(title)) {
+                return song;
+            }
+        }
+        return null;
     }
 
+    
     // ================== SEARCH METHODS (MUSIC STORE) ================== //
 
+    
     /**
-     * Searches the entire MusicStore for songs by title (case-insensitive).
+     * Searches for songs in the MusicStore by title.
+     * 
      * @param title The title to search for.
-     * @return A list of matching songs from the store.
+     * @return A list of matching songs.
      */
     public List<Song> searchStoreSongByTitle(String title) {
         return musicStore.getSongsByTitle(title);
     }
 
     /**
-     * Searches the entire MusicStore for songs by artist (case-insensitive).
+     * Searches for songs in the MusicStore by artist.
+     * 
      * @param artist The artist to search for.
-     * @return A list of matching songs from the store.
+     * @return A list of matching songs.
      */
     public List<Song> searchStoreSongByArtist(String artist) {
         return musicStore.getSongsByArtist(artist);
     }
 
     /**
-     * Searches the entire MusicStore for an album by title (case-insensitive).
+     * Searches for an album in the MusicStore by title.
+     * 
      * @param title The title to search for.
-     * @return The matching album or null.
+     * @return The matching album, or null if not found.
      */
     public Album searchStoreAlbumByTitle(String title) {
         return musicStore.getAlbumByTitle(title);
     }
 
     /**
-     * Searches the entire MusicStore for albums by artist (case-insensitive).
+     * Searches for albums in the MusicStore by artist.
+     * 
      * @param artist The artist to search for.
-     * @return A list of matching albums from the store.
+     * @return A list of matching albums.
      */
     public List<Album> searchStoreAlbumByArtist(String artist) {
         return musicStore.getAlbumsByArtist(artist);
     }
 
+    
     // ================== PLAYLIST MANAGEMENT ================== //
 
+    
     /**
-     * Creates a new playlist with the given name.
+     * Creates a new playlist and adds it to the library.
+     * 
      * @param name The name of the playlist.
-     * @return The newly created playlist.
+     * @return The created playlist.
      */
     public Playlist createPlaylist(String name) {
         Playlist playlist = new Playlist(name);
@@ -179,33 +243,41 @@ public class LibraryModel {
 
     /**
      * Returns all playlists in the library.
-     * @return A list of playlists (empty if none exist).
+     * 
+     * @return A list of playlists.
      */
     public List<Playlist> getPlaylists() {
         return new ArrayList<>(playlists);
     }
 
     /**
-     * Finds a playlist by name (case-insensitive).
-     * @param name The name of the playlist.
-     * @return The matching playlist or null.
+     * Searches for a playlist by name (case-insensitive).
+     * 
+     * @param name The name to search for.
+     * @return The matching playlist, or null if not found.
      */
     public Playlist getPlaylistByName(String name) {
-        return playlists.stream()
-            .filter(playlist -> playlist.getName().equalsIgnoreCase(name))
-            .findFirst()
-            .orElse(null);
+        for (Playlist playlist : playlists) {
+            if (playlist.getName().equalsIgnoreCase(name)) {
+                return playlist;
+            }
+        }
+        return null;
     }
 
+    
     // ================== RATING & FAVORITES ================== //
 
+    
     /**
-     * Rates a song and automatically marks it as a favorite if rated 5.
-     * @param song The song to rate.
-     * @param rating The rating value (1-5).
-     * @throws IllegalArgumentException If the rating is not between 1 and 5.
+     * Rates a song (1-5). A rating of 5 marks the song as a favorite.
+     * 
+     * @param song   The song to rate.
+     * @param rating The rating (1-5).
+     * @throws IllegalArgumentException If the rating is invalid.
      */
     public void rateSong(Song song, int rating) {
+        // Validate the rating is within the allowed range
         if (rating < 1 || rating > 5) {
             throw new IllegalArgumentException("Rating must be 1-5");
         }
@@ -213,21 +285,29 @@ public class LibraryModel {
     }
 
     /**
-     * Returns all songs marked as favorites in the library.
-     * @return A list of favorite songs (empty if none exist).
+     * Returns all favorite songs in the library.
+     * 
+     * @return A list of favorite songs.
      */
     public List<Song> getFavoriteSongs() {
-        return songLibrary.stream()
-            .filter(Song::isFavorite)
-            .collect(Collectors.toList());
+        List<Song> favorites = new ArrayList<>();
+        for (Song song : songLibrary) {
+            if (song.isFavorite()) {
+                favorites.add(song);
+            }
+        }
+        return favorites;
     }
 
+    
     // ================== HELPER METHODS ================== //
 
+    
     /**
      * Checks if a song exists in the MusicStore.
-     * @param song The song to validate.
-     * @return True if the song exists in the store.
+     * 
+     * @param song The song to check.
+     * @return True if the song exists in the store, false otherwise.
      */
     private boolean inStore(Song song) {
         return musicStore.getSongByArtistAndTitle(song.getArtist(), song.getTitle()) != null;
@@ -235,21 +315,24 @@ public class LibraryModel {
 
     /**
      * Checks if an album exists in the MusicStore.
-     * @param album The album to validate.
-     * @return True if the album exists in the store.
+     * 
+     * @param album The album to check.
+     * @return True if the album exists in the store, false otherwise.
      */
     private boolean inStore(Album album) {
         return musicStore.albumExists(album.getTitle(), album.getArtist());
     }
 
     /**
-     * Returns a list of all unique artists in the library.
-     * @return A list of artist names (empty if none exist).
+     * Returns a list of unique artist names in the library.
+     * 
+     * @return A list of artists.
      */
     public List<String> getArtists() {
-        return songLibrary.stream()
-            .map(Song::getArtist)
-            .distinct()
-            .collect(Collectors.toList());
+        Set<String> uniqueArtists = new HashSet<>();
+        for (Song song : songLibrary) {
+            uniqueArtists.add(song.getArtist());
+        }
+        return new ArrayList<>(uniqueArtists);
     }
 }
