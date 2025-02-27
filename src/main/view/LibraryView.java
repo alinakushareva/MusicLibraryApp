@@ -33,7 +33,8 @@ public class LibraryView {
     // ================== MAIN MENU ================== //
 
     /**
-     * Displays the main menu options.
+     * AI generated!
+     * Displays the main menu options. 
      */
     public void displayMainMenu() {
         System.out.println("\n=== Music Library Manager ===");
@@ -46,6 +47,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Handles user input for the main menu.
      */
     public void promptForCommand() {
@@ -84,6 +86,7 @@ public class LibraryView {
     // ================== STORE SEARCH ================== //
 
     /**
+     * AI generated!
      * Handles music store search operations.
      */
     private void handleStoreSearch() {
@@ -233,6 +236,7 @@ public class LibraryView {
     // ================== LIBRARY MANAGEMENT ================== //
 
     /**
+     * AI generated!
      * Handles library menu operations.
      */
     private void handleLibraryMenu() {
@@ -326,6 +330,7 @@ public class LibraryView {
     // ================== DISPLAY METHODS ================== //
 
     /**
+     * AI generated!
      * Displays all songs in the library.
      */
     private void displayLibrarySongs() {
@@ -341,6 +346,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Displays favorite songs in the library.
      */
     private void displayFavorites() {
@@ -356,6 +362,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Displays all albums in the library.
      */
     private void displayLibraryAlbums() {
@@ -372,6 +379,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Displays all artists in the library.
      */
     private void displayLibraryArtists() {
@@ -389,6 +397,7 @@ public class LibraryView {
     // ================== PLAYLIST MANAGEMENT ================== //
 
     /**
+     * AI generated!
      * Handles playlist menu operations.
      */
     private void handlePlaylistMenu() {
@@ -486,6 +495,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Displays all playlists in the library.
      */
     private void displayPlaylists() {
@@ -561,6 +571,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated!
      * Displays search results in appropriate format.
      * @param results The results to display (List or single object).
      */
@@ -608,6 +619,7 @@ public class LibraryView {
     }
 
     /**
+     * AI generated (design of the stars)
      * Generates star rating string.
      * @param rating The numerical rating (1-5).
      * @return String of star characters representing the rating.
