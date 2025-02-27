@@ -118,9 +118,10 @@ public class LibraryModel {
      */
     public List<Song> searchSongByTitle(String title) {
         List<Song> result = new ArrayList<>();
+        // Loop through all songs in the library
         for (Song song : songLibrary) {
             if (song.getTitle().equalsIgnoreCase(title)) {
-                result.add(song);
+                result.add(song); // Add matching song to the result list
             }
         }
         return result;
@@ -134,9 +135,10 @@ public class LibraryModel {
      */
     public List<Song> searchSongByArtist(String artist) {
         List<Song> result = new ArrayList<>();
+        // Loop through all songs in the library
         for (Song song : songLibrary) {
             if (song.getArtist().equalsIgnoreCase(artist)) {
-                result.add(song);
+                result.add(song); // Add matching song to the result list
             }
         }
         return result;
@@ -149,7 +151,9 @@ public class LibraryModel {
      * @return The matching album, or null if not found.
      */
     public Album searchAlbumByTitle(String title) {
+        // Loop through all albums in the library
         for (Album album : albumLibrary) {
+            // Check if the album title matches (case-insensitive)
             if (album.getTitle().equalsIgnoreCase(title)) {
                 return album;
             }
@@ -165,9 +169,10 @@ public class LibraryModel {
      */
     public List<Album> searchAlbumByArtist(String artist) {
         List<Album> result = new ArrayList<>();
+        // Loop through all albums in the library
         for (Album album : albumLibrary) {
             if (album.getArtist().equalsIgnoreCase(artist)) {
-                result.add(album);
+                result.add(album); // Add matching album to the result list
             }
         }
         return result;
@@ -181,7 +186,9 @@ public class LibraryModel {
      * @return The matching song, or null if not found.
      */
     public Song searchSongByArtistAndTitle(String artist, String title) {
+        // Loop through all songs in the library
         for (Song song : songLibrary) {
+            // Check if both the artist and title match (case-insensitive)
             if (song.getArtist().equalsIgnoreCase(artist) 
                 && song.getTitle().equalsIgnoreCase(title)) {
                 return song;
@@ -266,7 +273,9 @@ public class LibraryModel {
      * @return The matching playlist, or null if not found.
      */
     public Playlist getPlaylistByName(String name) {
+        // Loop through all playlists in the collection
         for (Playlist playlist : playlists) {
+            // Check if the playlist name matches (case-insensitive)
             if (playlist.getName().equalsIgnoreCase(name)) {
                 return playlist;
             }
@@ -300,7 +309,9 @@ public class LibraryModel {
      */
     public List<Song> getFavoriteSongs() {
         List<Song> favorites = new ArrayList<>();
+        // Loop through all songs in the library
         for (Song song : songLibrary) {
+            // Check if the song is marked as a favorite
             if (song.isFavorite()) {
                 favorites.add(song);
             }
@@ -339,7 +350,9 @@ public class LibraryModel {
      */
     public List<String> getArtists() {
         Set<String> uniqueArtists = new HashSet<>();
+        // Loop through all songs in the library
         for (Song song : songLibrary) {
+        	// Add artist name to the Set (duplicates are ignored)
             uniqueArtists.add(song.getArtist());
         }
         return new ArrayList<>(uniqueArtists);

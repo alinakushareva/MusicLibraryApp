@@ -59,19 +59,19 @@ public class LibraryView {
                 int choice = Integer.parseInt(input);
                 switch (choice) {
                     case 1:
-                        handleStoreSearch();
+                        handleStoreSearch(); // Navigate to the store search functionality
                         break;
                     case 2:
-                        handleLibraryMenu();
+                        handleLibraryMenu(); // Navigate to the library menu
                         break;
                     case 3:
-                        handlePlaylistMenu();
+                        handlePlaylistMenu(); // Navigate to the playlist menu
                         break;
                     case 4:
-                        handleRatingMenu();
+                        handleRatingMenu(); // Navigate to the song rating menu
                         break;
                     case 5:
-                        System.out.println("Exiting...");
+                        System.out.println("Exiting..."); // Display exit message
                         scanner.close();
                         return;
                     default:
@@ -91,6 +91,7 @@ public class LibraryView {
      */
     private void handleStoreSearch() {
         while (true) {
+        	// Display the search menu options
             System.out.println("\n=== Search Music Store ===");
             System.out.println("1. Search Songs by Title");
             System.out.println("2. Search Songs by Artist");
@@ -105,25 +106,25 @@ public class LibraryView {
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
-                        handleSongSearchByTitle();
+                        handleSongSearchByTitle(); // Search for a song by its title
                         break;
                     case 2:
-                        handleSongSearchByArtist();
+                        handleSongSearchByArtist(); // Search for songs by an artist
                         break;
                     case 3:
-                        handleAlbumSearchByTitle();
+                        handleAlbumSearchByTitle(); // Search for an album by its title
                         break;
                     case 4:
-                        handleAlbumSearchByArtist();
+                        handleAlbumSearchByArtist(); // Search for albums by an artist
                         break;
                     case 5:
-                        handleAddSong();
+                        handleAddSong(); // Add a song to the library
                         break;
                     case 6:
-                        handleAddAlbum();
+                        handleAddAlbum(); // Add an album to the library
                         break;
                     case 7:
-                        return;
+                        return; // Exit the search menu and return to the main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -295,12 +296,17 @@ public class LibraryView {
      * Handles removing a song from the library.
      */
     private void handleRemoveSong() {
+        // Prompt user to enter the song title
         System.out.print("Enter song title: ");
         String title = getUserInput();
+        
+        // Prompt user to enter the artist's name
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
         Song song = model.searchSongByArtistAndTitle(artist, title);
+        
+        // If the song exists, remove it from the library
         if (song != null) {
             model.removeSong(song);
             System.out.println("Song removed from library!");
@@ -313,12 +319,17 @@ public class LibraryView {
      * Handles removing an album from the library.
      */
     private void handleRemoveAlbum() {
+        // Prompt user to enter the album title
         System.out.print("Enter album title: ");
         String title = getUserInput();
+        
+        // Prompt user to enter the artist's name
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
         Album album = model.searchAlbumByTitle(title);
+        
+        // Check if the album exists and matches the artist's name before removing
         if (album != null && album.getArtist().equalsIgnoreCase(artist)) {
             model.removeAlbum(album);
             System.out.println("Album removed from library!");
@@ -335,10 +346,13 @@ public class LibraryView {
      */
     private void displayLibrarySongs() {
         Set<Song> songs = model.getSongLibrary();
+        
+        // Check if the library has any songs
         if (songs.isEmpty()) {
             System.out.println("\nYour library has no songs yet.");
         } else {
             System.out.println("\n=== Your Songs ===");
+            // Loop through each song and print its details
             for (Song song : songs) {
                 printSongWithRating(song);
             }
@@ -351,10 +365,13 @@ public class LibraryView {
      */
     private void displayFavorites() {
         List<Song> favorites = model.getFavoriteSongs();
+        
+        // Check if there are any favorite songs
         if (favorites.isEmpty()) {
             System.out.println("\nYou have no favorite songs yet.");
         } else {
             System.out.println("\n=== Your Favorites ===");
+            // Loop through each favorite song and print its details
             for (Song song : favorites) {
                 printSongWithRating(song);
             }
@@ -367,10 +384,13 @@ public class LibraryView {
      */
     private void displayLibraryAlbums() {
         Set<Album> albums = model.getAlbumLibrary();
+        
+        // Check if the library has any albums
         if (albums.isEmpty()) {
             System.out.println("\nYour library has no albums yet.");
         } else {
             System.out.println("\n=== Your Albums ===");
+            // Loop through each album and print its details
             for (Album album : albums) {
                 System.out.printf("- %s (%d) by %s\n",
                     album.getTitle(), album.getYear(), album.getArtist());
@@ -384,10 +404,13 @@ public class LibraryView {
      */
     private void displayLibraryArtists() {
         List<String> artists = model.getArtists();
+        
+        // Check if the library has any artists
         if (artists.isEmpty()) {
             System.out.println("\nYour library has no artists yet.");
         } else {
             System.out.println("\n=== Your Artists ===");
+            // Loop through each artist and print their name
             for (String artist : artists) {
                 System.out.println("- " + artist);
             }
@@ -402,6 +425,7 @@ public class LibraryView {
      */
     private void handlePlaylistMenu() {
         while (true) {
+            // Display the playlist management menu options
             System.out.println("\n=== Playlist Management ===");
             System.out.println("1. Create Playlist");
             System.out.println("2. Add Song to Playlist");
@@ -414,19 +438,19 @@ public class LibraryView {
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
-                        createPlaylist();
+                        createPlaylist(); // Create a new playlist
                         break;
                     case 2:
-                        addSongToPlaylist();
+                        addSongToPlaylist(); // Add a song to an existing playlist
                         break;
                     case 3:
-                        removeSongFromPlaylist();
+                        removeSongFromPlaylist(); // Remove a song from a playlist
                         break;
                     case 4:
-                        displayPlaylists();
+                        displayPlaylists(); // Display all available playlists
                         break;
                     case 5:
-                        return;
+                        return; // Exit the menu and return to the main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -440,8 +464,11 @@ public class LibraryView {
      * Creates a new playlist.
      */
     private void createPlaylist() {
+        // Prompt user to enter the name for the new playlist
         System.out.print("Enter playlist name: ");
         String name = getUserInput();
+        
+        // Create the playlist using the model
         model.createPlaylist(name);
         System.out.println("Playlist created!");
     }
@@ -508,6 +535,8 @@ public class LibraryView {
             // Iterating through each playlist
             for (Playlist playlist : playlists) {
                 System.out.printf("%s (%d songs):\n", playlist.getName(), playlist.getSongs().size());
+                
+                // Iterating through songs in playlist
                 for (Song song : playlist.getSongs()) {
                     String ratingStars = "";
                     if (song.getRating() > 0) {
