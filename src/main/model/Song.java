@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: Song.java
+ * Purpose: This class represents a song in the music library. It stores details such as the title,
+ *          artist, album, and rating. The class provides methods to rate songs and mark them as
+ *          favorites, enabling users to personalize their music experience.
+ */
 package main.model;
 
 public class Song {

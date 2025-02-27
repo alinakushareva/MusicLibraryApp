@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: LibraryModel.java
+ * Purpose: This class serves as the model for the music library, managing the user's collection of songs,
+ *          albums, and playlists. It provides methods to add, remove, and search for music, as well as
+ *          handle ratings and favorites. The model interacts with the MusicStore to ensure data consistency.
+ */
 package main.model;
 
 import main.database.MusicStore;

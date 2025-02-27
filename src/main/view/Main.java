@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: Main.java
+ * Purpose: This is the entry point of the MusicLibraryApp. It initializes the MusicStore, LibraryModel,
+ *          and LibraryView, and starts the application by launching the user interface. The main method
+ *          sets up the necessary components for the application to run.
+ */
 package main.view;
 
 import main.database.MusicStore;
@@ -6,16 +15,16 @@ import main.view.LibraryView;
 
 public class Main {
 	public static void main(String[] args) {
-	    // Initialize MusicStore with the path to your test data
+	    // Initializing MusicStore with the path to the test data
 	    MusicStore store = new MusicStore("src/main/albums");
 
-	    // Initialize LibraryModel with the MusicStore
+	    // Initializing LibraryModel with the MusicStore
 	    LibraryModel model = new LibraryModel(store);
 
-	    // Initialize LibraryView with the LibraryModel
+	    // Initializing LibraryView with the LibraryModel
 	    LibraryView view = new LibraryView(model);
 
-	    // Start the UI
+	    // Starting the UI
 	    view.promptForCommand();
 	}
 }

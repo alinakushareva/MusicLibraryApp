@@ -1,4 +1,12 @@
-package main.model;
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: Album.java
+ * Purpose: This class represents an album in the music library. It stores details such as the title,
+ *          artist, genre, and year, and maintains a list of songs. The class provides methods to add
+ *          songs and retrieve album information.
+ */package main.model;
 
 import java.util.ArrayList;
 import java.util.List;

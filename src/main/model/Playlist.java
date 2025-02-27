@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: Playlist.java
+ * Purpose: This class represents a playlist in the music library. It allows users to create playlists,
+ *          add or remove songs, and retrieve the list of songs. Playlists are used to organize and
+ *          manage custom collections of songs.
+ */
 package main.model;
 
 import java.util.ArrayList;

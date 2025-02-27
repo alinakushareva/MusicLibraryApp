@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: MusicStore.java
+ * Purpose: This class represents the music store, which manages the collection of albums and songs.
+ *          It loads data from files, organizes albums and songs by title and artist, and provides
+ *          methods to search and retrieve music data. The store acts as the database for the application.
+ */
 package main.database;
 
 import main.model.Album;
