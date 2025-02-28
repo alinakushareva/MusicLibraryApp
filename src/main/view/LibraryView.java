@@ -243,15 +243,16 @@ public class LibraryView {
     private void handleLibraryMenu() {
     	// Infinite loop to keep displaying the menu until user exits
         while (true) {
-            System.out.println("\n=== My Library ===");
+        	System.out.println("\n=== My Library ===");
             System.out.println("1. View All Songs");
             System.out.println("2. View All Albums");
             System.out.println("3. View All Artists");
-            System.out.println("4. View Playlists");
-            System.out.println("5. View Favorites");
-            System.out.println("6. Remove Song from Library");
-            System.out.println("7. Remove Album from Library");
-            System.out.println("8. Return to Main Menu");
+            System.out.println("4. Search Library"); 
+            System.out.println("5. View Playlists");
+            System.out.println("6. View Favorites");
+            System.out.println("7. Remove Song from Library");
+            System.out.println("8. Remove Album from Library");
+            System.out.println("9. Return to Main Menu"); 
             System.out.print("Enter choice: ");
 
             try {
@@ -268,18 +269,21 @@ public class LibraryView {
                         displayLibraryArtists(); // Show all artists in the library
                         break;
                     case 4:
-                        displayPlaylists(); // Show all playlists
+                    	handleLibrarySearch(); // Handle searching
                         break;
                     case 5:
-                        displayFavorites(); // Show favorite songs
+                        displayPlaylists(); // Show all playlists
                         break;
                     case 6:
-                        handleRemoveSong(); // Remove a song from the library
+                        displayFavorites(); // Show favorite songs
                         break;
                     case 7:
-                        handleRemoveAlbum(); // Remove an album from the library
+                        handleRemoveSong(); // Remove a song from the library
                         break;
                     case 8:
+                        handleRemoveAlbum(); // Remove an album from the library
+                        break;
+                    case 9:
                         return; // Exiting menu and returning to the main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
@@ -289,9 +293,118 @@ public class LibraryView {
             }
         }
     }
+    
+ // ================== LIBRARY SEARCH MENU ================== //
+    /**
+     * AI generated (design)!
+     * Handles library search operations.
+     */
+    private void handleLibrarySearch() {
+        while (true) {
+            // Search library menu options
+            System.out.println("\n=== Search Library ===");
+            System.out.println("1. Search Songs by Title");
+            System.out.println("2. Search Songs by Artist");
+            System.out.println("3. Search Albums by Title");
+            System.out.println("4. Search Albums by Artist");
+            System.out.println("5. Return to Library Menu");
+            System.out.print("Enter choice: ");
+
+            try {
+                int choice = Integer.parseInt(getUserInput());
+                switch (choice) {
+                    case 1:
+                        handleLibrarySongByTitle(); // Search for songs by title
+                        break;
+                    case 2:
+                        handleLibrarySongByArtist(); // Search for songs by artist
+                        break;
+                    case 3:
+                        handleLibraryAlbumByTitle(); // Search for albums by title
+                        break;
+                    case 4:
+                        handleLibraryAlbumByArtist(); // Search for albums by artist
+                        break;
+                    case 5:
+                        return; // Exit the search menu and return to the library menu
+                    default:
+                        System.out.println("Invalid choice. Try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    
+    // ================== LIBRARY SEARCH HANDLERS ================== //
+    
+    
+    /**
+     * Handles song search by title in the library.
+     */
+    private void handleLibrarySongByTitle() {
+    	// Prompt to user
+        System.out.print("Enter song title: ");
+        String title = getUserInput();
+        
+        // Search for songs in the library by title
+        List<Song> results = model.searchSongByTitle(title);
+        displaySearchResults(results);
+    }
+
+    /**
+     * Handles song search by artist in the library.
+     */
+    private void handleLibrarySongByArtist() {
+    	// Prompt to user
+        System.out.print("Enter artist: ");
+        String artist = getUserInput();
+        
+        // Search for songs in the library by artist
+        List<Song> results = model.searchSongByArtist(artist);
+        displaySearchResults(results);
+    }
+
+    /**
+     * Handles album search by title in the library.
+     */
+    private void handleLibraryAlbumByTitle() {
+        // Prompt to user 
+        System.out.print("Enter album title: ");
+        String title = getUserInput();
+
+        // Search for the album in the library by title
+        Album album = model.searchAlbumByTitle(title);
+
+        List<Album> results;
+        if (album != null) {
+            // If the album is found, creating a list with the single album
+            results = List.of(album);
+        } else {
+            // If the album is not found, using an empty list
+            results = Collections.emptyList();
+        }
+        displaySearchResults(results);
+    }
+
+    /**
+     * Handles album search by artist in the library.
+     */
+    private void handleLibraryAlbumByArtist() {
+        // Prompt to user 
+        System.out.print("Enter artist: ");
+        String artist = getUserInput();
+        
+        // Search for albums in the library by artist
+        List<Album> results = model.searchAlbumByArtist(artist);
+        displaySearchResults(results);
+    }
+    
 
     // ================== REMOVE SONGS & ALBUMS FROM LIBRARY ================== //
 
+    
     /**
      * Handles removing a song from the library.
      */
