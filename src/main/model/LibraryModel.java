@@ -318,6 +318,15 @@ public class LibraryModel {
         }
         return favorites;
     }
+    
+    /**
+     * Marks a song as a favorite.
+     * 
+     * @param song The song to mark as favorite.
+     */
+    public void markAsFavorite(Song song) {
+        song.markAsFavorite();
+    }
 
     
     // ================== HELPER METHODS ================== //

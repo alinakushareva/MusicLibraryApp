@@ -41,7 +41,7 @@ public class LibraryView {
         System.out.println("1. Search Music Store");
         System.out.println("2. My Library");
         System.out.println("3. Playlists");
-        System.out.println("4. Rate Songs & Favorites");
+        System.out.println("4. Manage Ratings & Favorites");
         System.out.println("5. Exit");
         System.out.print("Enter choice: ");
     }
@@ -509,13 +509,16 @@ public class LibraryView {
         String artist = getUserInput();
 
         Playlist playlist = model.getPlaylistByName(playlistName);
-        // Searching for the song by title and artist
         Song song = model.searchSongByArtistAndTitle(artist, songTitle);
 
-        // Checking if both the playlist and song exist
         if (playlist != null && song != null) {
-            playlist.removeSong(song);
-            System.out.println("Song removed from playlist!");
+            // Check if the song is actually in the playlist
+            if (playlist.getSongs().contains(song)) {
+                playlist.removeSong(song);
+                System.out.println("Song removed from playlist!");
+            } else {
+                System.out.println("Song not found in the playlist.");
+            }
         } else {
             System.out.println("Playlist or song not found.");
         }
@@ -552,41 +555,53 @@ public class LibraryView {
     // ================== RATING SYSTEM ================== //
 
     /**
-     * Handles song rating operations.
+     * Handles rating and favorite management operations.
      */
     private void handleRatingMenu() {
+        while (true) {
+            System.out.println("\n=== Manage Ratings & Favorites ===");
+            System.out.println("1. Rate a Song");
+            System.out.println("2. Mark Song as Favorite");
+            System.out.println("3. Return to Main Menu");
+            System.out.print("Enter choice: ");
+
+            try {
+                int choice = Integer.parseInt(getUserInput());
+                switch (choice) {
+                    case 1:
+                        handleSongRating();  // Existing rating functionality
+                        break;
+                    case 2:
+                        handleMarkAsFavorite();  // New favorite marking functionality
+                        break;
+                    case 3:
+                        return;  // Exit to main menu
+                    default:
+                        System.out.println("Invalid choice. Try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+    
+    /**
+     * Handles marking a song as a favorite.
+     */
+    private void handleMarkAsFavorite() {
         System.out.print("\nEnter song title: ");
         String title = getUserInput();
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
-        // Search for the song in the library
         Song song = model.searchSongByArtistAndTitle(artist, title);
         if (song == null) {
             System.out.println("Song not found in your library.");
             return;
         }
 
-        System.out.print("Enter rating (1-5): ");
-        try {
-            int rating = Integer.parseInt(getUserInput());
-            // Validating the rating input
-            if (rating < 1 || rating > 5) {
-                System.out.println("Invalid rating. Please enter a number between 1 and 5.");
-                return;
-            }
-            // Updating the song's rating
-            model.rateSong(song, rating);
-            if (rating == 5) {
-                System.out.println("★ Favorite added!");
-            } else {
-                System.out.println("Rating updated!");
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid rating. Must be a number between 1 and 5.");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        model.markAsFavorite(song);
+        System.out.println("★ Song marked as favorite!");
     }
 
     // ================== HELPER METHODS ================== //
@@ -644,6 +659,37 @@ public class LibraryView {
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * Handles song rating operations (renamed from handleRatingMenu).
+     */
+    private void handleSongRating() {
+        System.out.print("\nEnter song title: ");
+        String title = getUserInput();
+        System.out.print("Enter artist: ");
+        String artist = getUserInput();
+
+        Song song = model.searchSongByArtistAndTitle(artist, title);
+        if (song == null) {
+            System.out.println("Song not found in your library.");
+            return;
+        }
+
+        System.out.print("Enter rating (1-5): ");
+        try {
+            int rating = Integer.parseInt(getUserInput());
+            if (rating < 1 || rating > 5) {
+                System.out.println("Invalid rating. Please enter a number between 1 and 5.");
+                return;
+            }
+            model.rateSong(song, rating);
+            System.out.println(rating == 5 ? "★ Favorite added!" : "Rating updated!");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid rating. Must be a number between 1 and 5.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
