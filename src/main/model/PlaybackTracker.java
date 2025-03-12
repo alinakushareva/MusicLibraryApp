@@ -33,6 +33,10 @@ public class PlaybackTracker {
      * @param song The song that was played.
      */
     public void playSong(Song song) {
+        if (song == null) {
+            throw new IllegalArgumentException("Song cannot be null.");
+        }
+
         // Add the song to the recently played deque
         if (recentlyPlayed.size() >= RECENTLY_PLAYED_LIMIT) {
             recentlyPlayed.removeLast(); // Remove the oldest song if the limit is reached
@@ -77,6 +81,15 @@ public class PlaybackTracker {
      * @param user The user whose playback history will be saved.
      */
     public void savePlaybackData(User user) {
+        // Ensure the directory exists
+        File dir = new File("user_data");
+        if (!dir.exists()) {
+            boolean dirCreated = dir.mkdirs(); // Create the directory if it doesn't exist
+            if (!dirCreated) {
+                throw new RuntimeException("Failed to create directory: user_data");
+            }
+        }
+
         // Serialize recentlyPlayed and playCounts to JSON
         JSONObject playbackData = new JSONObject();
 
@@ -161,9 +174,28 @@ public class PlaybackTracker {
      * @param songTitle The title of the song to find.
      * @return The Song object, or null if not found.
      */
-    private Song findSongByTitle(User user, String songTitle) {
-        return user.getLibrary().searchSongByTitle(songTitle).stream()
-                .findFirst()
-                .orElse(null);
+    public Song findSongByTitle(User user, String songTitle) {
+        // Ensure the user’s library is initialized
+        if (user.getLibrary() == null) {
+            return null;
+        }
+
+        // Search all albums in user's library
+        for (Album album : user.getLibrary().getAlbumLibrary()) {
+            for (Song song : album.getSongs()) {
+                if (song.getTitle().equalsIgnoreCase(songTitle)) {
+                    return song;
+                }
+            }
+        }
+
+        // Search all individual songs in user's library (if applicable)
+        for (Song song : user.getLibrary().getSongLibrary()) {
+            if (song.getTitle().equalsIgnoreCase(songTitle)) {
+                return song;
+            }
+        }
+
+        return null; 
     }
 }
