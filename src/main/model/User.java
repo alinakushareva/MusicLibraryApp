@@ -238,6 +238,23 @@ public class User {
             }
         }
     }
+    
+    /**
+     * Creates a User object from pre-existing credentials.
+     * This method is used when loading user data from a file.
+     *
+     * @param username The username of the user.
+     * @param salt The salt used for password hashing.
+     * @param hashedPassword The hashed password.
+     * @return A User object with the provided credentials.
+     */
+    public static User fromCredentials(String username, String salt, String hashedPassword) {
+    	// Using a dummy password to avoid exposure of salt and hashing in the user class constructor
+        User user = new User(username, "dummyPassword"); 
+        user.salt = salt; // Set the salt
+        user.hashedPassword = hashedPassword; // Set the hashed password
+        return user;
+    }
 
     // ================== GETTERS ================== //
 

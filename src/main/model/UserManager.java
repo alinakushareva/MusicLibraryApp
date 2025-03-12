@@ -40,6 +40,7 @@ public class UserManager {
      * Authenticates a user and loads their data.
      *
      * @param username The username of the user.
+     * @param password The password of the user.
      * @return The authenticated User object.
      * @throws IllegalArgumentException If the username or password is incorrect.
      */
@@ -78,7 +79,7 @@ public class UserManager {
      * @param user The user whose library will be saved.
      */
     public void saveUserLibrary(User user) {
-        // Delegate to the User object's saveLibraryData method
+        user.saveLibraryData();
     }
 
     /**
