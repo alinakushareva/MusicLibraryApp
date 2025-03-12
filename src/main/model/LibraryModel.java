@@ -366,4 +366,19 @@ public class LibraryModel {
         }
         return new ArrayList<>(uniqueArtists);
     }
+    
+    /**
+     * Adds an album directly to the user's library without checking if it exists in the MusicStore.
+     * This method bypasses validation checks and is intended for loading saved user libraries.
+     * 
+     * @param album The album to be added to the library.
+     */
+    public void addAlbumDirect(Album album) {
+        // Directly add album to albumLibrary without checking inStore
+        albumLibrary.add(album);
+        // Also add each song to the songLibrary if needed
+        for (Song song : album.getSongs()) {
+            songLibrary.add(song);
+        }
+    }
 }
