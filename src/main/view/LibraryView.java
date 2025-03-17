@@ -19,6 +19,8 @@ import java.util.*;
 public class LibraryView {
     private final LibraryModel model;
     private final Scanner scanner;
+    private final UserManager userManager; 
+    private User currentUser; 
 
     /**
      * Constructs a LibraryView instance.
@@ -28,26 +30,73 @@ public class LibraryView {
     public LibraryView(LibraryModel model) {
         this.model = model;
         this.scanner = new Scanner(System.in);
+        this.userManager = new UserManager(); // Initialize UserManager
+        this.currentUser = null; // No user logged in initially
+    }
+
+    // ================== USER REGISTRATION & LOGIN ================== //
+
+    /**
+     * Handles user registration.
+     */
+    private void handleRegister() {
+        System.out.print("Enter username: ");
+        String username = getUserInput();
+        System.out.print("Enter password: ");
+        String password = getUserInput();
+
+        try {
+            userManager.registerUser(username, password);
+            System.out.println("User registered successfully!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handles user login.
+     */
+    private void handleLogin() {
+        System.out.print("Enter username: ");
+        String username = getUserInput();
+        System.out.print("Enter password: ");
+        String password = getUserInput();
+
+        try {
+            currentUser = userManager.loginUser(username, password);
+            System.out.println("Login successful!");
+            promptForCommand(); // Proceed to the main Music Library Manager menu
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     // ================== MAIN MENU ================== //
 
     /**
-     * AI generated!
-     * Displays the main menu options. 
+     * Displays the main menu options.
      */
     public void displayMainMenu() {
-        System.out.println("\n=== Music Library Manager ===");
-        System.out.println("1. Search Music Store");
-        System.out.println("2. My Library");
-        System.out.println("3. Playlists");
-        System.out.println("4. Manage Ratings & Favorites");
-        System.out.println("5. Exit");
-        System.out.print("Enter choice: ");
+        if (currentUser == null) {
+            // Show registration/login menu if no user is logged in
+            System.out.println("\n=== Welcome to the Music Library Manager ===");
+            System.out.println("1. Register");
+            System.out.println("2. Login");
+            System.out.println("3. Exit");
+            System.out.print("Enter choice: ");
+        } else {
+            // Show the regular Music Library Manager menu if a user is logged in
+            System.out.println("\n=== Music Library Manager ===");
+            System.out.println("1. Search Music Store");
+            System.out.println("2. My Library");
+            System.out.println("3. Playlists");
+            System.out.println("4. Manage Ratings & Favorites");
+            System.out.println("5. Logout");
+            System.out.print("Enter choice: ");
+        }
     }
 
     /**
-     * AI generated!
      * Handles user input for the main menu.
      */
     public void promptForCommand() {
@@ -57,25 +106,44 @@ public class LibraryView {
 
             try {
                 int choice = Integer.parseInt(input);
-                switch (choice) {
-                    case 1:
-                        handleStoreSearch(); // Navigate to the store search functionality
-                        break;
-                    case 2:
-                        handleLibraryMenu(); // Navigate to the library menu
-                        break;
-                    case 3:
-                        handlePlaylistMenu(); // Navigate to the playlist menu
-                        break;
-                    case 4:
-                        handleRatingMenu(); // Navigate to the song rating menu
-                        break;
-                    case 5:
-                        System.out.println("Exiting..."); // Display exit message
-                        scanner.close();
-                        return;
-                    default:
-                        System.out.println("Invalid choice. Try again.");
+                if (currentUser == null) {
+                    // Handle registration/login menu
+                    switch (choice) {
+                        case 1:
+                            handleRegister(); // Register a new user
+                            break;
+                        case 2:
+                            handleLogin(); // Login an existing user
+                            break;
+                        case 3:
+                            System.out.println("Exiting...");
+                            scanner.close();
+                            return;
+                        default:
+                            System.out.println("Invalid choice. Try again.");
+                    }
+                } else {
+                    // Handle the regular Music Library Manager menu
+                    switch (choice) {
+                        case 1:
+                            handleStoreSearch(); // Navigate to the store search functionality
+                            break;
+                        case 2:
+                            handleLibraryMenu(); // Navigate to the library menu
+                            break;
+                        case 3:
+                            handlePlaylistMenu(); // Navigate to the playlist menu
+                            break;
+                        case 4:
+                            handleRatingMenu(); // Navigate to the song rating menu
+                            break;
+                        case 5:
+                            currentUser = null; // Logout
+                            System.out.println("Logged out successfully!");
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Try again.");
+                    }
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
