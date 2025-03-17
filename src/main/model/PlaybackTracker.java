@@ -72,6 +72,18 @@ public class PlaybackTracker {
                 .map(Map.Entry::getKey) // Extract the Song objects
                 .collect(Collectors.toList());
     }
+    
+    
+    // ================== GET PLAY COUNTS ================== //
+
+    /**
+     * Returns the map of songs and their play counts.
+     *
+     * @return A map where the key is the song and the value is the number of times it has been played.
+     */
+    public Map<Song, Integer> getPlayCounts() {
+        return playCounts;
+    }
 
     // ================== SAVE/LOAD PLAYBACK DATA ================== //
 

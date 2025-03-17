@@ -17,6 +17,8 @@ public class LibraryModel {
     private final Set<Album> albumLibrary = new HashSet<>();
     private final List<Playlist> playlists = new ArrayList<>();
     private final MusicStore musicStore;
+    private final PlaybackTracker playbackTracker; 
+    
 
     /**
      * Constructs a LibraryModel with a reference to the MusicStore.
@@ -25,6 +27,7 @@ public class LibraryModel {
      */
     public LibraryModel(MusicStore musicStore) {
         this.musicStore = musicStore;
+        this.playbackTracker = new PlaybackTracker(); 
     }
 
     /**
@@ -34,6 +37,15 @@ public class LibraryModel {
      */
     public MusicStore getMusicStore() {
         return this.musicStore;
+    }
+    
+    /**
+     * Retrieves the PlaybackTracker associated with this library model.
+     * 
+     * @return The PlaybackTracker instance.
+     */
+    public PlaybackTracker getPlaybackTracker() {
+        return this.playbackTracker;
     }
 
     

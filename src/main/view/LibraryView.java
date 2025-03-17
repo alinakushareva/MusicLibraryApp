@@ -138,7 +138,8 @@ public class LibraryView {
                             handleRatingMenu(); // Navigate to the song rating menu
                             break;
                         case 5:
-                            currentUser = null; // Logout
+                            userManager.saveUserLibrary(currentUser); // Add this line to save playback data
+                            currentUser = null;
                             System.out.println("Logged out successfully!");
                             break;
                         default:
@@ -309,9 +310,8 @@ public class LibraryView {
      * Handles library menu operations.
      */
     private void handleLibraryMenu() {
-    	// Infinite loop to keep displaying the menu until user exits
         while (true) {
-        	System.out.println("\n=== My Library ===");
+            System.out.println("\n=== My Library ===");
             System.out.println("1. View All Songs");
             System.out.println("2. View All Albums");
             System.out.println("3. View All Artists");
@@ -320,11 +320,13 @@ public class LibraryView {
             System.out.println("6. View Favorites");
             System.out.println("7. Remove Song from Library");
             System.out.println("8. Remove Album from Library");
-            System.out.println("9. Return to Main Menu"); 
+            System.out.println("9. Play a Song"); // New option to play a song
+            System.out.println("10. View Recently Played Songs"); // New option to view recently played songs
+            System.out.println("11. View Most Played Songs"); // New option to view most played songs
+            System.out.println("12. Return to Main Menu"); 
             System.out.print("Enter choice: ");
 
             try {
-            	// Reading user input and converting to integer
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
@@ -337,7 +339,7 @@ public class LibraryView {
                         displayLibraryArtists(); // Show all artists in the library
                         break;
                     case 4:
-                    	handleLibrarySearch(); // Handle searching
+                        handleLibrarySearch(); // Handle searching
                         break;
                     case 5:
                         displayPlaylists(); // Show all playlists
@@ -352,12 +354,75 @@ public class LibraryView {
                         handleRemoveAlbum(); // Remove an album from the library
                         break;
                     case 9:
+                        handlePlaySong(); // New: Play a song
+                        break;
+                    case 10:
+                        displayRecentlyPlayedSongs(); // New: View recently played songs
+                        break;
+                    case 11:
+                        displayMostPlayedSongs(); // New: View most played songs
+                        break;
+                    case 12:
                         return; // Exiting menu and returning to the main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+    
+    
+ // ================== PLAYBACK FUNCTIONALITY ================== //
+
+    /**
+     * Handles playing a song.
+     */
+    private void handlePlaySong() {
+        System.out.print("Enter song title: ");
+        String title = getUserInput();
+        System.out.print("Enter artist: ");
+        String artist = getUserInput();
+
+        // Search for the song in the library
+        Song song = model.searchSongByArtistAndTitle(artist, title);
+        if (song == null) {
+            System.out.println("Song not found in your library.");
+            return;
+        }
+
+        // Simulate playing the song
+        currentUser.getLibrary().getPlaybackTracker().playSong(song);
+        System.out.println("Now playing: " + song.getTitle() + " by " + song.getArtist());
+    }
+
+    /**
+     * Displays the 10 most recently played songs.
+     */
+    private void displayRecentlyPlayedSongs() {
+        List<Song> recentlyPlayed = currentUser.getLibrary().getPlaybackTracker().getRecentlyPlayed();
+        if (recentlyPlayed.isEmpty()) {
+            System.out.println("\nYou haven't played any songs yet.");
+        } else {
+            System.out.println("\n=== Recently Played Songs ===");
+            for (Song song : recentlyPlayed) {
+                printSongWithRating(song);
+            }
+        }
+    }
+
+    /**
+     * Displays the 10 most frequently played songs.
+     */
+    private void displayMostPlayedSongs() {
+        List<Song> mostPlayed = currentUser.getLibrary().getPlaybackTracker().getMostPlayed();
+        if (mostPlayed.isEmpty()) {
+            System.out.println("\nYou haven't played any songs yet.");
+        } else {
+            System.out.println("\n=== Most Played Songs ===");
+            for (Song song : mostPlayed) {
+                printSongWithRating(song);
             }
         }
     }

@@ -85,6 +85,9 @@ public class User {
         JSONObject libraryJson = serializeLibrary();
         userJson.put("library", libraryJson);
 
+        // Save playback data
+        this.library.getPlaybackTracker().savePlaybackData(this);
+
         // Construct the file path correctly
         File file = new File(dir, "user_" + this.username + ".json");
 
@@ -168,6 +171,9 @@ public class User {
                 // Deserialize the library from JSON
                 JSONObject libraryJson = userJson.getJSONObject("library");
                 deserializeLibrary(libraryJson);
+
+                // Load playback data
+                this.library.getPlaybackTracker().loadPlaybackData(this);
 
             } catch (IOException e) {
                 throw new RuntimeException("Error loading user library data", e);
