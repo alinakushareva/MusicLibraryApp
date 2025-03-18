@@ -393,4 +393,45 @@ public class LibraryModel {
             songLibrary.add(song);
         }
     }
+    
+    
+    /**
+     * Returns a list of all songs in the library sorted by title (ascending), then by artist (ascending).
+     */
+    public List<Song> getSongsSortedByTitleAndArtist() {
+        List<Song> sorted = new ArrayList<>(songLibrary);
+        sorted.sort(Comparator
+            .comparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER));
+        return sorted;
+    }
+
+    /**
+     * Returns a list of all albums in the library sorted by title (ascending).
+     */
+    public List<Album> getAlbumsSortedByTitle() {
+        List<Album> sorted = new ArrayList<>(albumLibrary);
+        sorted.sort(Comparator.comparing(Album::getTitle, String.CASE_INSENSITIVE_ORDER));
+        return sorted;
+    }
+
+    /**
+     * Returns a list of all artists in the library sorted alphabetically (ascending).
+     */
+    public List<String> getArtistsSorted() {
+        List<String> artists = getArtists(); // Reuse existing method to get unique artists
+        artists.sort(String.CASE_INSENSITIVE_ORDER);
+        return artists;
+    }
+
+    /**
+     * Returns a list of all songs in the library sorted by rating (ascending), then by title (ascending).
+     */
+    public List<Song> getSongsSortedByRating() {
+        List<Song> sorted = new ArrayList<>(songLibrary);
+        sorted.sort(Comparator
+            .comparingInt(Song::getRating)
+            .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
+        return sorted;
+    }
 }

@@ -315,28 +315,29 @@ public class LibraryView {
             System.out.println("1. View All Songs");
             System.out.println("2. View All Albums");
             System.out.println("3. View All Artists");
-            System.out.println("4. Search Library"); 
+            System.out.println("4. Search Library");
             System.out.println("5. View Playlists");
             System.out.println("6. View Favorites");
             System.out.println("7. Remove Song from Library");
             System.out.println("8. Remove Album from Library");
-            System.out.println("9. Play a Song"); // New option to play a song
-            System.out.println("10. View Recently Played Songs"); // New option to view recently played songs
-            System.out.println("11. View Most Played Songs"); // New option to view most played songs
-            System.out.println("12. Return to Main Menu"); 
+            System.out.println("9. Play a Song");
+            System.out.println("10. View Recently Played Songs");
+            System.out.println("11. View Most Played Songs");
+            System.out.println("12. View Songs by Rating"); // New option
+            System.out.println("13. Return to Main Menu"); // Updated numbering
             System.out.print("Enter choice: ");
 
             try {
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
-                        displayLibrarySongs(); // Show all songs in the library
+                        displayLibrarySongs(); // Show all songs (sorted by title and artist)
                         break;
                     case 2:
-                        displayLibraryAlbums(); // Show all albums in the library
+                        displayLibraryAlbums(); // Show all albums (sorted by title)
                         break;
                     case 3:
-                        displayLibraryArtists(); // Show all artists in the library
+                        displayLibraryArtists(); // Show all artists (sorted alphabetically)
                         break;
                     case 4:
                         handleLibrarySearch(); // Handle searching
@@ -354,16 +355,19 @@ public class LibraryView {
                         handleRemoveAlbum(); // Remove an album from the library
                         break;
                     case 9:
-                        handlePlaySong(); // New: Play a song
+                        handlePlaySong(); // Play a song
                         break;
                     case 10:
-                        displayRecentlyPlayedSongs(); // New: View recently played songs
+                        displayRecentlyPlayedSongs(); // View recently played songs
                         break;
                     case 11:
-                        displayMostPlayedSongs(); // New: View most played songs
+                        displayMostPlayedSongs(); // View most played songs
                         break;
                     case 12:
-                        return; // Exiting menu and returning to the main menu
+                        displaySongsByRating(); // New: View songs sorted by rating
+                        break;
+                    case 13:
+                        return; // Exit to main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -427,7 +431,7 @@ public class LibraryView {
         }
     }
     
- // ================== LIBRARY SEARCH MENU ================== //
+    // ================== LIBRARY SEARCH MENU ================== //
     /**
      * AI generated (design)!
      * Handles library search operations.
@@ -435,34 +439,30 @@ public class LibraryView {
     private void handleLibrarySearch() {
         while (true) {
             System.out.println("\n=== Search Library ===");
-            System.out.println("1. Get Songs by Title");
-            System.out.println("2. Get Songs by Artist");
-            System.out.println("3. Get Songs by Rating");
-            System.out.println("4. Get Albums by Title");
-            System.out.println("5. Get Albums by Artist");
-            System.out.println("6. Return to Library Menu");
+            System.out.println("1. Search Songs by Title");
+            System.out.println("2. Search Songs by Artist");
+            System.out.println("3. Search Albums by Title");
+            System.out.println("4. Search Albums by Artist");
+            System.out.println("5. Return to Library Menu");
             System.out.print("Enter choice: ");
 
             try {
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
-                        handleLibrarySongByTitle(); // Search + sort by title
+                        handleLibrarySongByTitle(); // Search for songs by title
                         break;
                     case 2:
-                        handleLibrarySongByArtist(); // Search + sort by artist
+                        handleLibrarySongByArtist(); // Search for songs by artist
                         break;
                     case 3:
-                        handleLibrarySongsByRating(); // New: Sort by rating
+                        handleLibraryAlbumByTitle(); // Search for albums by title
                         break;
                     case 4:
-                        handleLibraryAlbumByTitle(); 
+                        handleLibraryAlbumByArtist(); // Search for albums by artist
                         break;
                     case 5:
-                        handleLibraryAlbumByArtist();
-                        break;
-                    case 6:
-                        return; 
+                        return; // Exit the search menu and return to the library menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -477,49 +477,25 @@ public class LibraryView {
     
     
     /**
-     * Handles song search by title in the library (sorted by title and artist).
+     * Handles song search by title in the library (no sorting).
      */
     private void handleLibrarySongByTitle() {
         System.out.print("Enter song title: ");
         String title = getUserInput();
         List<Song> results = model.searchSongByTitle(title);
-        
-        // Sort by title (ascending), then by artist (ascending)
-        results.sort(Comparator
-            .comparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER)
-            .thenComparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER));
-        
-        displaySearchResults(results);
+        displaySearchResults(results); 
     }
 
     /**
-     * Handles song search by artist in the library (sorted).
+     * Handles song search by artist in the library (no sorting).
      */
     private void handleLibrarySongByArtist() {
         System.out.print("Enter artist: ");
         String artist = getUserInput();
         List<Song> results = model.searchSongByArtist(artist);
-        
-        // Sort by artist (ascending) then title
-        results.sort(Comparator
-            .comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
-            .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
-        displaySearchResults(results);
+        displaySearchResults(results); 
     }
     
-    /**
-     * Handles sorting songs by rating in the library.
-     */
-    private void handleLibrarySongsByRating() {
-        List<Song> sortedSongs = new ArrayList<>(model.getSongLibrary());
-        
-        // Sort by rating (ascending), then by title
-        sortedSongs.sort(Comparator
-            .comparingInt(Song::getRating)
-            .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
-        
-        displaySearchResults(sortedSongs);
-    }
     
     /**
      * Handles album search by title in the library.
@@ -613,14 +589,12 @@ public class LibraryView {
      * Displays all songs in the library.
      */
     private void displayLibrarySongs() {
-        Set<Song> songs = model.getSongLibrary();
+        List<Song> songs = model.getSongsSortedByTitleAndArtist();
         
-        // Check if the library has any songs
         if (songs.isEmpty()) {
             System.out.println("\nYour library has no songs yet.");
         } else {
             System.out.println("\n=== Your Songs ===");
-            // Loop through each song and print its details
             for (Song song : songs) {
                 printSongWithRating(song);
             }
@@ -651,14 +625,12 @@ public class LibraryView {
      * Displays all albums in the library.
      */
     private void displayLibraryAlbums() {
-        Set<Album> albums = model.getAlbumLibrary();
+        List<Album> albums = model.getAlbumsSortedByTitle();
         
-        // Check if the library has any albums
         if (albums.isEmpty()) {
             System.out.println("\nYour library has no albums yet.");
         } else {
             System.out.println("\n=== Your Albums ===");
-            // Loop through each album and print its details
             for (Album album : albums) {
                 System.out.printf("- %s (%d) by %s\n",
                     album.getTitle(), album.getYear(), album.getArtist());
@@ -671,16 +643,31 @@ public class LibraryView {
      * Displays all artists in the library.
      */
     private void displayLibraryArtists() {
-        List<String> artists = model.getArtists();
+        List<String> artists = model.getArtistsSorted();
         
-        // Check if the library has any artists
         if (artists.isEmpty()) {
             System.out.println("\nYour library has no artists yet.");
         } else {
             System.out.println("\n=== Your Artists ===");
-            // Loop through each artist and print their name
             for (String artist : artists) {
                 System.out.println("- " + artist);
+            }
+        }
+    }
+    
+    
+    /**
+     * Displays all songs in the library sorted by rating (ascending).
+     */
+    private void displaySongsByRating() {
+        List<Song> songs = model.getSongsSortedByRating();
+        
+        if (songs.isEmpty()) {
+            System.out.println("\nYour library has no songs yet.");
+        } else {
+            System.out.println("\n=== Songs by Rating ===");
+            for (Song song : songs) {
+                printSongWithRating(song);
             }
         }
     }
