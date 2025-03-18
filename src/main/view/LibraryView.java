@@ -214,6 +214,9 @@ public class LibraryView {
         // Search for matching songs in the store
         List<Song> results = model.searchStoreSongByTitle(title);
         displaySearchResults(results);
+
+        // After displaying results, prompt the user to request album information
+        promptForAlbumInfo(results);
     }
 
     /**
@@ -225,8 +228,79 @@ public class LibraryView {
         // Searching for matching songs in the store
         List<Song> results = model.searchStoreSongByArtist(artist);
         displaySearchResults(results);
+
+        // After displaying results, prompt the user to request album information
+        promptForAlbumInfo(results);
     }
 
+    /**
+     * Prompts the user to request album information for a specific song after search results are displayed.
+     * @param songs The list of songs from the search results.
+     */
+    private void promptForAlbumInfo(List<Song> songs) {
+        if (songs.isEmpty()) {
+            return; // No songs to request album info for
+        }
+
+        System.out.print("\nWould you like to view album information for a song? (yes/no): ");
+        String response = getUserInput().toLowerCase();
+
+        if (response.equals("yes")) {
+            if (songs.size() == 1) {
+                // If there's only one song, directly display its album information
+                displayAlbumInfo(songs.get(0));
+            } else {
+                // If there are multiple songs, list them and let the user choose
+                System.out.println("Enter the number of the song to view its album information:");
+                for (int i = 0; i < songs.size(); i++) {
+                    Song song = songs.get(i);
+                    System.out.printf("%d. %s by %s\n", i + 1, song.getTitle(), song.getArtist());
+                }
+
+                System.out.print("Enter your choice (1-" + songs.size() + "): ");
+                try {
+                    int choice = Integer.parseInt(getUserInput());
+                    if (choice >= 1 && choice <= songs.size()) {
+                        Song selectedSong = songs.get(choice - 1);
+                        displayAlbumInfo(selectedSong);
+                    } else {
+                        System.out.println("Invalid choice. Please enter a number between 1 and " + songs.size() + ".");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Displays album information for a specific song, including whether the album is in the user's library.
+     * @param song The song to display album information for.
+     */
+    private void displayAlbumInfo(Song song) {
+        Album album = song.getAlbum();
+        if (album == null) {
+            System.out.println("No album information available for this song.");
+            return;
+        }
+
+        System.out.println("\n=== Album Information ===");
+        System.out.println("Title: " + album.getTitle());
+        System.out.println("Artist: " + album.getArtist());
+        System.out.println("Year: " + album.getYear());
+        System.out.println("Genre: " + album.getGenre());
+
+        // Check if the album is in the user's library
+        boolean isAlbumInLibrary = model.getAlbumLibrary().contains(album);
+        System.out.println("Album in your library: " + (isAlbumInLibrary ? "Yes" : "No"));
+
+        // Display the songs in the album
+        System.out.println("\nSongs in the album:");
+        for (Song albumSong : album.getSongs()) {
+            System.out.printf("- %s by %s\n", albumSong.getTitle(), albumSong.getArtist());
+        }
+    }
+    
     /**
      * Handles album search by title in the music store.
      */
