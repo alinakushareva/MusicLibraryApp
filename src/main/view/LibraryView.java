@@ -483,12 +483,13 @@ public class LibraryView {
      */
     private void handleLibrarySearch() {
         while (true) {
-            System.out.println("\n=== Search Library ===");
+        	System.out.println("\n=== Search Library ===");
             System.out.println("1. Search Songs by Title");
             System.out.println("2. Search Songs by Artist");
-            System.out.println("3. Search Albums by Title");
-            System.out.println("4. Search Albums by Artist");
-            System.out.println("5. Return to Library Menu");
+            System.out.println("3. Search Songs by Genre"); 
+            System.out.println("4. Search Albums by Title");
+            System.out.println("5. Search Albums by Artist");
+            System.out.println("6. Return to Library Menu");
             System.out.print("Enter choice: ");
 
             try {
@@ -501,12 +502,15 @@ public class LibraryView {
                         handleLibrarySongByArtist(); // Search for songs by artist
                         break;
                     case 3:
-                        handleLibraryAlbumByTitle(); // Search for albums by title
+                        handleLibrarySongByGenre(); // Search for songs by genre
                         break;
                     case 4:
-                        handleLibraryAlbumByArtist(); // Search for albums by artist
+                        handleLibraryAlbumByTitle(); // Search for albums by title
                         break;
                     case 5:
+                        handleLibraryAlbumByArtist(); // Search for albums by artist
+                        break;
+                    case 6:
                         return; // Exit the search menu and return to the library menu
                     default:
                         System.out.println("Invalid choice. Try again.");
@@ -520,6 +524,18 @@ public class LibraryView {
     
     // ================== LIBRARY SEARCH HANDLERS ================== //
     
+    /**
+     * Handles song search by genre in the user's library.
+     */
+    private void handleLibrarySongByGenre() {
+        System.out.print("Enter genre: ");
+        String genre = getUserInput();
+        List<Song> results = model.searchSongByGenre(genre);
+        displaySearchResults(results);
+
+        // After displaying results, prompt the user to request album information
+        promptForAlbumInfo(results);
+    }
     
     /**
      * Handles song search by title in the user's library.

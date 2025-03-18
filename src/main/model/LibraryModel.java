@@ -231,6 +231,23 @@ public class LibraryModel {
         }
         return null;
     }
+    
+    /**
+     * Searches for songs in the library by genre (case-insensitive).
+     * 
+     * @param genre The genre to search for.
+     * @return A list of matching songs.
+     */
+    public List<Song> searchSongByGenre(String genre) {
+        List<Song> result = new ArrayList<>();
+        // Loop through all songs in the library
+        for (Song song : songLibrary) {
+            if (song.getAlbum().getGenre().equalsIgnoreCase(genre)) {
+                result.add(song); // Add matching song to the result list
+            }
+        }
+        return result;
+    }
 
     
     // ================== SEARCH METHODS (MUSIC STORE) ================== //
