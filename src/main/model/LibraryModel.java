@@ -434,4 +434,30 @@ public class LibraryModel {
             .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
         return sorted;
     }
+    
+    
+    /**
+     * Returns a shuffled list of all songs in the library.
+     */
+    public List<Song> getShuffledSongs() {
+        List<Song> shuffledSongs = new ArrayList<>(songLibrary);
+        Collections.shuffle(shuffledSongs); // Shuffle the list
+        return shuffledSongs;
+    }
+
+    /**
+     * Returns a shuffled list of songs in the specified playlist.
+     * 
+     * @param playlistName The name of the playlist.
+     * @return A shuffled list of songs, or an empty list if the playlist doesn't exist.
+     */
+    public List<Song> getShuffledPlaylistSongs(String playlistName) {
+        Playlist playlist = getPlaylistByName(playlistName);
+        if (playlist == null) {
+            return Collections.emptyList(); // Return an empty list if the playlist doesn't exist
+        }
+        List<Song> shuffledSongs = new ArrayList<>(playlist.getSongs());
+        Collections.shuffle(shuffledSongs); // Shuffle the list
+        return shuffledSongs;
+    }
 }

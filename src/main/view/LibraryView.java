@@ -323,8 +323,9 @@ public class LibraryView {
             System.out.println("9. Play a Song");
             System.out.println("10. View Recently Played Songs");
             System.out.println("11. View Most Played Songs");
-            System.out.println("12. View Songs by Rating"); // New option
-            System.out.println("13. Return to Main Menu"); // Updated numbering
+            System.out.println("12. View Songs by Rating"); 
+            System.out.println("13. Shuffle Songs"); 
+            System.out.println("14. Return to Main Menu"); 
             System.out.print("Enter choice: ");
 
             try {
@@ -364,9 +365,12 @@ public class LibraryView {
                         displayMostPlayedSongs(); // View most played songs
                         break;
                     case 12:
-                        displaySongsByRating(); // New: View songs sorted by rating
+                        displaySongsByRating(); //  View songs sorted by rating
                         break;
                     case 13:
+                    	handleShuffleSongs(); //  Shuffle songs in the library
+                        break;
+                    case 14:
                         return; // Exit to main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
@@ -377,6 +381,17 @@ public class LibraryView {
         }
     }
     
+    private void handleShuffleSongs() {
+        System.out.println("\n=== Shuffled Songs ===");
+        List<Song> shuffledSongs = model.getShuffledSongs();
+        if (shuffledSongs.isEmpty()) {
+            System.out.println("Your library has no songs yet.");
+        } else {
+            for (Song song : shuffledSongs) {
+                printSongWithRating(song);
+            }
+        }
+    }
     
  // ================== PLAYBACK FUNCTIONALITY ================== //
 
@@ -686,7 +701,8 @@ public class LibraryView {
             System.out.println("2. Add Song to Playlist");
             System.out.println("3. Remove Song from Playlist");
             System.out.println("4. View Playlists");
-            System.out.println("5. Return to Main Menu");
+            System.out.println("5. Shuffle Playlist"); 
+            System.out.println("6. Return to Main Menu");
             System.out.print("Enter choice: ");
 
             try {
@@ -705,12 +721,29 @@ public class LibraryView {
                         displayPlaylists(); // Display all available playlists
                         break;
                     case 5:
+                        handleShufflePlaylist();
+                    case 6:
                         return; // Exit the menu and return to the main menu
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+    
+    private void handleShufflePlaylist() {
+        System.out.print("Enter playlist name: ");
+        String playlistName = getUserInput();
+        List<Song> shuffledSongs = model.getShuffledPlaylistSongs(playlistName);
+        
+        if (shuffledSongs.isEmpty()) {
+            System.out.println("Playlist not found or is empty.");
+        } else {
+            System.out.println("\n=== Shuffled Playlist: " + playlistName + " ===");
+            for (Song song : shuffledSongs) {
+                printSongWithRating(song);
             }
         }
     }
