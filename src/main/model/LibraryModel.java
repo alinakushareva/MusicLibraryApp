@@ -54,14 +54,37 @@ public class LibraryModel {
     
     /**
      * Adds a song to the library if it exists in the MusicStore.
+     * Also adds the song's album to the library, but only includes the songs that have been added.
      * 
      * @param song The song to add.
      */
     public void addSong(Song song) {
         if (inStore(song)) {
+            // Add the song to the song library
             songLibrary.add(song);
+
+            // Get the album from the MusicStore
+            Album storeAlbum = song.getAlbum();
+            if (storeAlbum != null) {
+                // Check if the album already exists in the user's library
+                Album libraryAlbum = searchAlbumByTitle(storeAlbum.getTitle());
+
+                if (libraryAlbum == null) {
+                    // If the album doesn't exist in the library, create a new album with only this song
+                    List<Song> songsInAlbum = new ArrayList<>();
+                    songsInAlbum.add(song);
+                    Album newAlbum = new Album(storeAlbum.getTitle(), storeAlbum.getArtist(), storeAlbum.getGenre(), storeAlbum.getYear(), songsInAlbum);
+                    albumLibrary.add(newAlbum);
+                } else {
+                    // If the album exists, add the song to the existing album (if it's not already there)
+                    if (!libraryAlbum.getSongs().contains(song)) {
+                        libraryAlbum.getSongs().add(song);
+                    }
+                }
+            }
         }
     }
+
 
     /**
      * Removes a song from the library.

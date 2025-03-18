@@ -724,6 +724,10 @@ public class LibraryView {
             for (Album album : albums) {
                 System.out.printf("- %s (%d) by %s\n",
                     album.getTitle(), album.getYear(), album.getArtist());
+                System.out.println("Songs in your library:");
+                for (Song song : album.getSongs()) {
+                    System.out.printf("  - %s by %s\n", song.getTitle(), song.getArtist());
+                }
             }
         }
     }

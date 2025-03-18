@@ -6,18 +6,19 @@
  * Purpose: This class represents an album in the music library. It stores details such as the title,
  *          artist, genre, and year, and maintains a list of songs. The class provides methods to add
  *          songs and retrieve album information.
- */package main.model;
+ */
+package main.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Album {
-	private final String title;
+    private final String title;
     private final String artist;
     private final String genre;
     private final int year;
-    private final List<Song> songs = new ArrayList<>();
-    
+    private final List<Song> songs;
+
     /* 
      * Constructor: Creates a new Album instance
      * Params: title (String) - Album title
@@ -32,6 +33,25 @@ public class Album {
         this.artist = artist;
         this.genre = genre;
         this.year = year;
+        this.songs = new ArrayList<>(); // Initialize an empty list of songs
+    }
+
+    /* 
+     * Constructor: Creates a new Album instance with a list of songs
+     * Params: title (String) - Album title
+     *         artist (String) - Album artist
+     *         genre (String) - Music genre
+     *         year (int) - Release year
+     *         songs (List<Song>) - List of songs in the album
+     * @pre title != null && artist != null && genre != null & year != 0
+     * Output: None (constructor)
+     */
+    public Album(String title, String artist, String genre, int year, List<Song> songs) {
+        this.title = title;
+        this.artist = artist;
+        this.genre = genre;
+        this.year = year;
+        this.songs = new ArrayList<>(songs); // Initialize with the provided list of songs
     }
     
     /* 
@@ -43,26 +63,25 @@ public class Album {
         songs.add(song);
     }
     
-    
     // ================== GETTERS ================== //
 
     public String getTitle() { 
-    	return title; 
+        return title; 
     }
     
     public String getArtist() { 
-    	return artist;
+        return artist;
     }
     
     public String getGenre() {
-    	return genre; 
+        return genre; 
     }
     
     public int getYear() { 
-    	return year; 
+        return year; 
     }
     
     public List<Song> getSongs() { 
-    	return new ArrayList<>(songs);
+        return new ArrayList<>(songs);
     }
 }
