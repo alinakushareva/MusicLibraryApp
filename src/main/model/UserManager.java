@@ -1,10 +1,12 @@
 package main.model;
 
-import java.util.Map;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
-
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 
 public class UserManager {
     private Map<String, User> users; // Stores all users, with username as the key
@@ -15,7 +17,8 @@ public class UserManager {
      * Initializes the users map and loads existing users from the file.
      */
     public UserManager() {
-        // Initialize the users map and load users from the file
+        this.users = new HashMap<>();
+        loadUsers(); // Load users from the file when UserManager is instantiated
     }
 
     // ================== USER REGISTRATION ================== //
@@ -28,10 +31,13 @@ public class UserManager {
      * @throws IllegalArgumentException If the username is already taken or if username/password is invalid.
      */
     public void registerUser(String username, String password) {
-        // Check if the username already exists
-        // Validate username and password
-        // Create a new User object and add it to the users map
-        // Save the updated users map to the file
+        if (usernameExists(username)) {
+            throw new IllegalArgumentException("Username already exists.");
+        }
+
+        User newUser = new User(username, password);
+        users.put(username, newUser);
+        saveUsers(); // Save the updated users map to the file
     }
 
     // ================== USER LOGIN ================== //
@@ -45,30 +51,71 @@ public class UserManager {
      * @throws IllegalArgumentException If the username or password is incorrect.
      */
     public User loginUser(String username, String password) {
-        // Check if the username exists in the users map
-        // Validate the password using the User object's validatePassword method
-        // Load the user's library data
-        // Return the authenticated User object
-    	return null; // just to compile
+        User user = users.get(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found.");
+        }
+
+        if (!user.validatePassword(password)) {
+            throw new IllegalArgumentException("Incorrect password.");
+        }
+
+        loadUserLibrary(user); // Load the user's library when they log in
+        return user;
     }
 
     // ================== SAVE/LOAD USERS ================== //
 
     /**
      * Saves all users' credentials (username, salt, hashedPassword) to a JSON file.
+     *
+     * @throws IllegalStateException If an error occurs while saving the file.
      */
     public void saveUsers() {
-        // Serialize the users map to JSON
-        // Write the JSON data to the USER_FILE
+        JSONArray usersArray = new JSONArray();
+        for (User user : users.values()) {
+            JSONObject userJson = new JSONObject();
+            userJson.put("username", user.getUsername());
+            userJson.put("salt", user.getSalt());
+            userJson.put("hashedPassword", user.getHashedPassword());
+            usersArray.put(userJson);
+        }
+
+        try (FileWriter writer = new FileWriter(USER_FILE)) {
+            writer.write(usersArray.toString(4)); // Pretty print JSON
+        } catch (IOException e) {
+            throw new IllegalStateException("Error saving users to file", e);
+        }
     }
 
     /**
      * Loads all users' credentials (username, salt, hashedPassword) from a JSON file.
+     *
+     * @throws IllegalStateException If an error occurs while loading the file.
      */
     public void loadUsers() {
-        // Read the JSON data from the USER_FILE
-        // Deserialize the JSON data into User objects
-        // Add the User objects to the users map
+        File file = new File(USER_FILE);
+        if (!file.exists()) {
+            return; // No users file exists yet
+        }
+
+        try {
+            String jsonData = new String(Files.readAllBytes(Paths.get(USER_FILE)));
+            JSONArray usersArray = new JSONArray(jsonData);
+
+            for (int i = 0; i < usersArray.length(); i++) {
+                JSONObject userJson = usersArray.getJSONObject(i);
+                String username = userJson.getString("username");
+                String salt = userJson.getString("salt");
+                String hashedPassword = userJson.getString("hashedPassword");
+
+                // Use the factory method to create a User object
+                User user = User.fromCredentials(username, salt, hashedPassword);
+                users.put(username, user);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Error loading users from file", e);
+        }
     }
 
     // ================== SAVE/LOAD USER LIBRARY ================== //
@@ -88,7 +135,7 @@ public class UserManager {
      * @param user The user whose library will be loaded.
      */
     public void loadUserLibrary(User user) {
-        // Delegate to the User object's loadLibraryData method
+        user.loadLibraryData();
     }
 
     // ================== HELPER METHODS ================== //
@@ -100,26 +147,6 @@ public class UserManager {
      * @return True if the username exists, false otherwise.
      */
     private boolean usernameExists(String username) {
-        // Check if the username exists in the users map
-		return false; // just to compile
-    }
-
-    /**
-     * Serializes the users map to a JSON object.
-     *
-     * @return A JSON object containing all users' credentials.
-     */
-    private JSONObject serializeUsers() {
-        // Convert the users map to a JSON object
-		return null; // just to compile
-    }
-
-    /**
-     * Deserializes a JSON object into the users map.
-     *
-     * @param usersJson A JSON object containing all users' credentials.
-     */
-    private void deserializeUsers(JSONObject usersJson) {
-        // Convert the JSON object to a users map
+        return users.containsKey(username);
     }
 }
