@@ -434,32 +434,35 @@ public class LibraryView {
      */
     private void handleLibrarySearch() {
         while (true) {
-            // Search library menu options
             System.out.println("\n=== Search Library ===");
-            System.out.println("1. Search Songs by Title");
-            System.out.println("2. Search Songs by Artist");
-            System.out.println("3. Search Albums by Title");
-            System.out.println("4. Search Albums by Artist");
-            System.out.println("5. Return to Library Menu");
+            System.out.println("1. Get Songs by Title");
+            System.out.println("2. Get Songs by Artist");
+            System.out.println("3. Get Songs by Rating");
+            System.out.println("4. Get Albums by Title");
+            System.out.println("5. Get Albums by Artist");
+            System.out.println("6. Return to Library Menu");
             System.out.print("Enter choice: ");
 
             try {
                 int choice = Integer.parseInt(getUserInput());
                 switch (choice) {
                     case 1:
-                        handleLibrarySongByTitle(); // Search for songs by title
+                        handleLibrarySongByTitle(); // Search + sort by title
                         break;
                     case 2:
-                        handleLibrarySongByArtist(); // Search for songs by artist
+                        handleLibrarySongByArtist(); // Search + sort by artist
                         break;
                     case 3:
-                        handleLibraryAlbumByTitle(); // Search for albums by title
+                        handleLibrarySongsByRating(); // New: Sort by rating
                         break;
                     case 4:
-                        handleLibraryAlbumByArtist(); // Search for albums by artist
+                        handleLibraryAlbumByTitle(); 
                         break;
                     case 5:
-                        return; // Exit the search menu and return to the library menu
+                        handleLibraryAlbumByArtist();
+                        break;
+                    case 6:
+                        return; 
                     default:
                         System.out.println("Invalid choice. Try again.");
                 }
@@ -474,31 +477,50 @@ public class LibraryView {
     
     
     /**
-     * Handles song search by title in the library.
+     * Handles song search by title in the library (sorted by title and artist).
      */
     private void handleLibrarySongByTitle() {
-    	// Prompt to user
         System.out.print("Enter song title: ");
         String title = getUserInput();
-        
-        // Search for songs in the library by title
         List<Song> results = model.searchSongByTitle(title);
+        
+        // Sort by title (ascending), then by artist (ascending)
+        results.sort(Comparator
+            .comparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER));
+        
         displaySearchResults(results);
     }
 
     /**
-     * Handles song search by artist in the library.
+     * Handles song search by artist in the library (sorted).
      */
     private void handleLibrarySongByArtist() {
-    	// Prompt to user
         System.out.print("Enter artist: ");
         String artist = getUserInput();
-        
-        // Search for songs in the library by artist
         List<Song> results = model.searchSongByArtist(artist);
+        
+        // Sort by artist (ascending) then title
+        results.sort(Comparator
+            .comparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER)
+            .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
         displaySearchResults(results);
     }
-
+    
+    /**
+     * Handles sorting songs by rating in the library.
+     */
+    private void handleLibrarySongsByRating() {
+        List<Song> sortedSongs = new ArrayList<>(model.getSongLibrary());
+        
+        // Sort by rating (ascending), then by title
+        sortedSongs.sort(Comparator
+            .comparingInt(Song::getRating)
+            .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
+        
+        displaySearchResults(sortedSongs);
+    }
+    
     /**
      * Handles album search by title in the library.
      */
