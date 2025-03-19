@@ -18,6 +18,7 @@ public class LibraryModel {
     private final List<Playlist> playlists = new ArrayList<>();
     private final MusicStore musicStore;
     private final PlaybackTracker playbackTracker; 
+    private final AutoPlaylistManager autoPlaylistManager;
     
 
     /**
@@ -28,6 +29,8 @@ public class LibraryModel {
     public LibraryModel(MusicStore musicStore) {
         this.musicStore = musicStore;
         this.playbackTracker = new PlaybackTracker(); 
+        this.autoPlaylistManager = new AutoPlaylistManager();
+
     }
 
     /**
@@ -82,6 +85,9 @@ public class LibraryModel {
                     }
                 }
             }
+
+            // Update auto playlists
+            autoPlaylistManager.updateAutoPlaylists(this);
         }
     }
 
@@ -93,6 +99,8 @@ public class LibraryModel {
      */
     public void removeSong(Song song) {
         songLibrary.remove(song);
+        // Update auto playlists
+        autoPlaylistManager.updateAutoPlaylists(this);
     }
 
     /**
@@ -131,7 +139,8 @@ public class LibraryModel {
     public Set<Song> getSongLibrary() {
         return Collections.unmodifiableSet(songLibrary);
     }
-
+    
+    
     /**
      * Returns an unmodifiable view of the albums in the library.
      * 
@@ -352,6 +361,8 @@ public class LibraryModel {
             throw new IllegalArgumentException("Rating must be 1-5");
         }
         song.rate(rating);
+        // Update auto playlists
+        autoPlaylistManager.updateAutoPlaylists(this);
     }
 
     /**
@@ -378,6 +389,17 @@ public class LibraryModel {
      */
     public void markAsFavorite(Song song) {
         song.markAsFavorite();
+        // Update auto playlists
+        autoPlaylistManager.updateAutoPlaylists(this);
+    }
+    
+    /**
+     * Returns all system-generated playlists.
+     * 
+     * @return A list of system-generated playlists.
+     */
+    public List<Playlist> getAutoPlaylists() {
+        return autoPlaylistManager.getAutoPlaylists();
     }
 
     

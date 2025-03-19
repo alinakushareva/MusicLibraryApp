@@ -791,7 +791,7 @@ public class LibraryView {
     private void handlePlaylistMenu() {
         while (true) {
             // Display the playlist management menu options
-            System.out.println("\n=== Playlist Management ===");
+        	System.out.println("\n=== Playlist Management ===");
             System.out.println("1. Create Playlist");
             System.out.println("2. Add Song to Playlist");
             System.out.println("3. Remove Song from Playlist");
@@ -912,28 +912,48 @@ public class LibraryView {
      * Displays all playlists in the library.
      */
     private void displayPlaylists() {
-        List<Playlist> playlists = model.getPlaylists();
-        // Checking if there are no playlists and notifying the user
-        if (playlists.isEmpty()) {
+        // Get user-created playlists
+        List<Playlist> userPlaylists = model.getPlaylists();
+        // Get system-generated playlists
+        List<Playlist> systemPlaylists = model.getAutoPlaylists();
+
+        // Check if there are no playlists at all
+        if (userPlaylists.isEmpty() && systemPlaylists.isEmpty()) {
             System.out.println("\nYou have no playlists yet.");
-        } else {
-            System.out.println("\n=== Your Playlists ===");
-            // Iterating through each playlist
-            for (Playlist playlist : playlists) {
+            return;
+        }
+
+        // Display user-created playlists
+        if (!userPlaylists.isEmpty()) {
+            System.out.println("\n=== User Playlists ===");
+            for (Playlist playlist : userPlaylists) {
                 System.out.printf("%s (%d songs):\n", playlist.getName(), playlist.getSongs().size());
-                
-                // Iterating through songs in playlist
                 for (Song song : playlist.getSongs()) {
                     String ratingStars = "";
                     if (song.getRating() > 0) {
                         ratingStars = " " + getRatingStars(song.getRating());
                     }
-                    System.out.printf(" - %s by %s%s\n",
-                        song.getTitle(), song.getArtist(), ratingStars);
+                    System.out.printf(" - %s by %s%s\n", song.getTitle(), song.getArtist(), ratingStars);
+                }
+            }
+        }
+
+        // Display system-generated playlists
+        if (!systemPlaylists.isEmpty()) {
+            System.out.println("\n=== System Playlists ===");
+            for (Playlist playlist : systemPlaylists) {
+                System.out.printf("%s (%d songs):\n", playlist.getName(), playlist.getSongs().size());
+                for (Song song : playlist.getSongs()) {
+                    String ratingStars = "";
+                    if (song.getRating() > 0) {
+                        ratingStars = " " + getRatingStars(song.getRating());
+                    }
+                    System.out.printf(" - %s by %s%s\n", song.getTitle(), song.getArtist(), ratingStars);
                 }
             }
         }
     }
+
 
     // ================== RATING SYSTEM ================== //
 
