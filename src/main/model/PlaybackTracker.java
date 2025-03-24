@@ -1,3 +1,11 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: PlaybackTracker.java
+ * Purpose: Tracks song playback history including recently played songs and play counts.
+ *          Handles saving/loading playback data to persistent storage.
+ */
 package main.model;
 
 import java.io.BufferedReader;
@@ -125,7 +133,7 @@ public class PlaybackTracker {
         // Save to a file
         String fileName = "user_data/playback_" + user.getUsername() + ".json";
         try (FileWriter writer = new FileWriter(fileName)) {
-            writer.write(playbackData.toString(4)); // Pretty print JSON
+            writer.write(playbackData.toString(4)); // To JSON
         } catch (IOException e) {
             throw new RuntimeException("Error saving playback data", e);
         }
@@ -137,13 +145,16 @@ public class PlaybackTracker {
      * @param user The user whose playback history will be loaded.
      */
     public void loadPlaybackData(User user) {
+        // Construct the filename using the user's username
         String fileName = "user_data/playback_" + user.getUsername() + ".json";
         File file = new File(fileName);
 
+        // Return early if no playback data file exists for this user
         if (!file.exists()) {
             return; // No playback data exists yet
         }
 
+        // Try-with-resources to auto-close the reader
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             StringBuilder jsonData = new StringBuilder();
             String line;
@@ -151,30 +162,32 @@ public class PlaybackTracker {
                 jsonData.append(line);
             }
 
+            // Parse the JSON string into a JSONObject
             JSONObject playbackData = new JSONObject(jsonData.toString());
 
             // Deserialize recently played songs
             JSONArray recentlyPlayedArray = playbackData.getJSONArray("recentlyPlayed");
             recentlyPlayed.clear();
+            // Process each song title in the array
             for (int i = 0; i < recentlyPlayedArray.length(); i++) {
                 String songTitle = recentlyPlayedArray.getString(i);
-                Song song = findSongByTitle(user, songTitle);
+                Song song = findSongByTitle(user, songTitle); // Find matching song in library
                 if (song != null) {
-                    recentlyPlayed.add(song);
+                    recentlyPlayed.add(song); // Add to recently played if found
                 }
             }
 
             // Deserialize play counts
             JSONObject playCountsObject = playbackData.getJSONObject("playCounts");
             playCounts.clear();
+            // Process each song entry in play counts
             for (String songTitle : playCountsObject.keySet()) {
-                int count = playCountsObject.getInt(songTitle);
-                Song song = findSongByTitle(user, songTitle);
+                int count = playCountsObject.getInt(songTitle); // Get play count
+                Song song = findSongByTitle(user, songTitle); // Find matching song
                 if (song != null) {
-                    playCounts.put(song, count);
+                    playCounts.put(song, count); // Update play count if song exists
                 }
             }
-
         } catch (IOException e) {
             throw new RuntimeException("Error loading playback data", e);
         }
@@ -194,7 +207,6 @@ public class PlaybackTracker {
         if (user.getLibrary() == null) {
             return null;
         }
-
         // Search all albums in user's library
         for (Album album : user.getLibrary().getAlbumLibrary()) {
             for (Song song : album.getSongs()) {
@@ -203,14 +215,12 @@ public class PlaybackTracker {
                 }
             }
         }
-
         // Search all individual songs in user's library (if applicable)
         for (Song song : user.getLibrary().getSongLibrary()) {
             if (song.getTitle().equalsIgnoreCase(songTitle)) {
                 return song;
             }
         }
-
         return null; 
     }
 }

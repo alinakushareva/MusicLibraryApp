@@ -1,3 +1,12 @@
+/**
+ * Name: Alina Kushareva
+ * Class: CSC335 Spring 2025
+ * Project: MusicLibraryApp
+ * File: UserManager.java
+ * Purpose: Manages user authentication, registration, and data persistence.
+ *          Handles loading/saving user credentials and library data to JSON files.
+ *          Uses secure password hashing with salts for credential storage.
+ */
 package main.model;
 
 import org.json.JSONArray;
@@ -31,10 +40,12 @@ public class UserManager {
      * @throws IllegalArgumentException If the username is already taken or if username/password is invalid.
      */
     public void registerUser(String username, String password) {
+        // Check if username already taken
         if (usernameExists(username)) {
             throw new IllegalArgumentException("Username already exists.");
         }
 
+        // Create and store new user
         User newUser = new User(username, password);
         users.put(username, newUser);
         saveUsers(); // Save the updated users map to the file
@@ -51,11 +62,13 @@ public class UserManager {
      * @throws IllegalArgumentException If the username or password is incorrect.
      */
     public User loginUser(String username, String password) {
+        // Find user by username
         User user = users.get(username);
         if (user == null) {
             throw new IllegalArgumentException("User not found.");
         }
 
+        // Validate password
         if (!user.validatePassword(password)) {
             throw new IllegalArgumentException("Incorrect password.");
         }
@@ -73,16 +86,18 @@ public class UserManager {
      */
     public void saveUsers() {
         JSONArray usersArray = new JSONArray();
+        
+        // Convert each user to JSON
         for (User user : users.values()) {
             JSONObject userJson = new JSONObject();
             userJson.put("username", user.getUsername());
-            userJson.put("salt", user.getSalt());
-            userJson.put("hashedPassword", user.getHashedPassword());
+            userJson.put("salt", user.getSalt()); // Store password salt
+            userJson.put("hashedPassword", user.getHashedPassword()); // Store hashed password
             usersArray.put(userJson);
         }
-
+        // Write to file 
         try (FileWriter writer = new FileWriter(USER_FILE)) {
-            writer.write(usersArray.toString(4)); // Pretty print JSON
+            writer.write(usersArray.toString(4)); // To JSON
         } catch (IOException e) {
             throw new IllegalStateException("Error saving users to file", e);
         }
@@ -100,9 +115,11 @@ public class UserManager {
         }
 
         try {
+            // Read entire file contents
             String jsonData = new String(Files.readAllBytes(Paths.get(USER_FILE)));
             JSONArray usersArray = new JSONArray(jsonData);
 
+            // Process each user in the array
             for (int i = 0; i < usersArray.length(); i++) {
                 JSONObject userJson = usersArray.getJSONObject(i);
                 String username = userJson.getString("username");

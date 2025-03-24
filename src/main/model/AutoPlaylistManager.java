@@ -1,5 +1,5 @@
 /**
- * Name: 
+ * Name: Alina Kushareva
  * Class: CSC335 Spring 2025
  * Project: MusicLibraryApp
  * File: AutoPlaylistManager.java
@@ -20,6 +20,35 @@ public class AutoPlaylistManager {
     }
 
     /**
+     * Copy constructor - creates a deep copy of another AutoPlaylistManager
+     * @param original The AutoPlaylistManager to copy
+     */
+    public AutoPlaylistManager(AutoPlaylistManager original) {
+    	// Input validation
+        if (original == null) {
+            throw new IllegalArgumentException("Original AutoPlaylistManager cannot be null");
+        }
+        
+        // Create a new map for the auto playlists
+        this.autoPlaylists = new HashMap<>();
+        
+        // Make deep copies of each playlist
+        for (Map.Entry<String, Playlist> entry : original.autoPlaylists.entrySet()) {
+            String playlistName = entry.getKey();
+            Playlist originalPlaylist = entry.getValue();
+            
+            // Create a new playlist with the same name
+            Playlist copiedPlaylist = new Playlist(playlistName);
+            
+            // Copy all songs from the original playlist
+            for (Song song : originalPlaylist.getSongs()) {
+                copiedPlaylist.addSong(song);
+            }
+            this.autoPlaylists.put(playlistName, copiedPlaylist);
+        }
+    }
+
+	/**
      * Updates the system-generated playlists based on the user's library.
      * 
      * @param userLibrary The user's library model.
@@ -68,7 +97,10 @@ public class AutoPlaylistManager {
      * @return A map where the key is the playlist name and the value is the number of songs.
      */
     public Map<String, Integer> getAutoPlaylistInfo() {
+        // Result map
         Map<String, Integer> playlistInfo = new HashMap<>();
+        
+        // Looping through all playlists and storing name and song count
         for (Map.Entry<String, Playlist> entry : autoPlaylists.entrySet()) {
             playlistInfo.put(entry.getKey(), entry.getValue().getSongs().size());
         }

@@ -37,37 +37,53 @@ public class LibraryView {
     // ================== USER REGISTRATION & LOGIN ================== //
 
     /**
-     * Handles user registration.
+     * Handles the user registration flow including input validation.
+     * Collects username/password and attempts registration through UserManager.
+     * Provides appropriate feedback for success/failure cases.
      */
     private void handleRegister() {
+        // Prompt for and collect user credentials
         System.out.print("Enter username: ");
-        String username = getUserInput();
+        String username = getUserInput(); // Reads username from console
+        
         System.out.print("Enter password: ");
-        String password = getUserInput();
+        String password = getUserInput(); // Reads password from console 
 
         try {
+            // Attempt registration through UserManager
             userManager.registerUser(username, password);
-            System.out.println("User registered successfully!");
+            System.out.println("User registered successfully!"); // Success feedback
+            
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            // Handle validation errors from UserManager
+            System.out.println("Error: " + e.getMessage()); // Error feedback
         }
     }
 
     /**
-     * Handles user login.
+     * Handles the user authentication flow.
+     * Collects credentials, verifies through UserManager, and transitions to main app.
+     * Manages the currentUser session state on successful login.
      */
     private void handleLogin() {
+        // Prompt for and collect login credentials
         System.out.print("Enter username: ");
-        String username = getUserInput();
+        String username = getUserInput(); // Reads username input
+        
         System.out.print("Enter password: ");
-        String password = getUserInput();
+        String password = getUserInput(); // Reads password input
 
         try {
+            // Authenticate user through UserManager
             currentUser = userManager.loginUser(username, password);
-            System.out.println("Login successful!");
-            promptForCommand(); // Proceed to the main Music Library Manager menu
+            System.out.println("Login successful!"); // Success feedback
+            
+            // Transition to main application interface
+            promptForCommand(); // Launch main command loop
+            
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            // Handle authentication failures
+            System.out.println("Error: " + e.getMessage()); // Error feedback
         }
     }
 
@@ -233,26 +249,32 @@ public class LibraryView {
      * @param song The song to display album information for.
      */
     private void displayAlbumInfo(Song song) {
+        // Get the album associated with the song
         Album album = song.getAlbum();
+        // Handle case where song has no album information
         if (album == null) {
             System.out.println("No album information available for this song.");
-            return;
+            return; // Exit early if no album exists
         }
 
+        // === Display Album Header ===
         System.out.println("\n=== Album Information ===");
         System.out.println("Title: " + album.getTitle());
         System.out.println("Artist: " + album.getArtist());
         System.out.println("Year: " + album.getYear());
         System.out.println("Genre: " + album.getGenre());
 
-        // Check if the album is in the user's library
+        // === Library Status Check ===
+        // Verify if album exists in user's collection
         boolean isAlbumInLibrary = model.getAlbumLibrary().contains(album);
         System.out.println("Album in your library: " + (isAlbumInLibrary ? "Yes" : "No"));
 
-        // Display the songs in the album
+        // === Track Listing ===
         System.out.println("\nSongs in the album:");
+        
+        // Display all songs in album with consistent formatting
         for (Song albumSong : album.getSongs()) {
-            System.out.printf("- %s by %s\n", albumSong.getTitle(), albumSong.getArtist());
+            System.out.printf("- %s by %s%n", albumSong.getTitle(), albumSong.getArtist());
         }
     }
 
@@ -411,12 +433,19 @@ public class LibraryView {
         }
     }
     
+    /**
+     * Displays all songs in shuffled order with ratings.
+     * Shows message if library is empty.
+     */
     private void handleShuffleSongs() {
+        // Display shuffle mode header
         System.out.println("\n=== Shuffled Songs ===");
         List<Song> shuffledSongs = model.getShuffledSongs();
+        // Handle empty library case
         if (shuffledSongs.isEmpty()) {
             System.out.println("Your library has no songs yet.");
         } else {
+            // Display each song with consistent formatting
             for (Song song : shuffledSongs) {
                 printSongWithRating(song);
             }
@@ -450,13 +479,15 @@ public class LibraryView {
      * Displays the 10 most recently played songs.
      */
     private void displayRecentlyPlayedSongs() {
+        // Get recent playback history from tracker
         List<Song> recentlyPlayed = currentUser.getLibrary().getPlaybackTracker().getRecentlyPlayed();
+        
         if (recentlyPlayed.isEmpty()) {
-            System.out.println("\nYou haven't played any songs yet.");
+            System.out.println("\nYou haven't played any songs yet."); // No history case
         } else {
-            System.out.println("\n=== Recently Played Songs ===");
+            System.out.println("\n=== Recently Played Songs ==="); // Header
             for (Song song : recentlyPlayed) {
-                printSongWithRating(song);
+                printSongWithRating(song); // Show each song with rating
             }
         }
     }
@@ -465,13 +496,15 @@ public class LibraryView {
      * Displays the 10 most frequently played songs.
      */
     private void displayMostPlayedSongs() {
+        // Get top played songs from tracker
         List<Song> mostPlayed = currentUser.getLibrary().getPlaybackTracker().getMostPlayed();
+        
         if (mostPlayed.isEmpty()) {
-            System.out.println("\nYou haven't played any songs yet.");
+            System.out.println("\nYou haven't played any songs yet."); // No plays case
         } else {
-            System.out.println("\n=== Most Played Songs ===");
+            System.out.println("\n=== Most Played Songs ==="); // Header
             for (Song song : mostPlayed) {
-                printSongWithRating(song);
+                printSongWithRating(song); // Show each song with play count
             }
         }
     }
@@ -568,14 +601,17 @@ public class LibraryView {
      * @param songs The list of songs from the search results.
      */
     private void promptForAlbumInfo(List<Song> songs) {
+    	// Early return if no songs are found
         if (songs.isEmpty()) {
-            return; // No songs to request album info for
+            return; 
         }
 
+        // Ask user if they want album info
         System.out.print("\nWould you like to view album information for a song? (yes/no): ");
         String response = getUserInput().toLowerCase();
 
         if (response.equals("yes")) {
+            // Handle single song case
             if (songs.size() == 1) {
                 // If there's only one song, directly display its album information
                 displayAlbumInfo(songs.get(0));
@@ -587,13 +623,16 @@ public class LibraryView {
                     System.out.printf("%d. %s by %s\n", i + 1, song.getTitle(), song.getArtist());
                 }
 
+                // Get and validate user selection
                 System.out.print("Enter your choice (1-" + songs.size() + "): ");
                 try {
                     int choice = Integer.parseInt(getUserInput());
+                    // Check if choice is within valid range
                     if (choice >= 1 && choice <= songs.size()) {
-                        Song selectedSong = songs.get(choice - 1);
+                        Song selectedSong = songs.get(choice - 1); // Convert to 0-based index
                         displayAlbumInfo(selectedSong);
                     } else {
+                    	// Handle non-number input
                         System.out.println("Invalid choice. Please enter a number between 1 and " + songs.size() + ".");
                     }
                 } catch (NumberFormatException e) {
@@ -695,14 +734,20 @@ public class LibraryView {
      * Displays all songs in the library.
      */
     private void displayLibrarySongs() {
+        // Get songs sorted alphabetically by title then artist
         List<Song> songs = model.getSongsSortedByTitleAndArtist();
         
+        // Handle empty library case
         if (songs.isEmpty()) {
             System.out.println("\nYour library has no songs yet.");
-        } else {
-            System.out.println("\n=== Your Songs ===");
+        } 
+        // Display all songs with ratings
+        else {
+            System.out.println("\n=== Your Songs ===");  // Section header
+            
+            // Print each song with formatted rating
             for (Song song : songs) {
-                printSongWithRating(song);
+                printSongWithRating(song);  
             }
         }
     }
@@ -731,15 +776,21 @@ public class LibraryView {
      * Displays all albums in the library.
      */
     private void displayLibraryAlbums() {
+        // Get albums sorted alphabetically by title
         List<Album> albums = model.getAlbumsSortedByTitle();
         
         if (albums.isEmpty()) {
-            System.out.println("\nYour library has no albums yet.");
+            System.out.println("\nYour library has no albums yet."); // Empty state
         } else {
-            System.out.println("\n=== Your Albums ===");
+            System.out.println("\n=== Your Albums ==="); // Section header
+            
+            // Display each album with its songs
             for (Album album : albums) {
+                // Print album metadata (title, year, artist)
                 System.out.printf("- %s (%d) by %s\n",
                     album.getTitle(), album.getYear(), album.getArtist());
+                
+                // List all songs in the album
                 System.out.println("Songs in your library:");
                 for (Song song : album.getSongs()) {
                     System.out.printf("  - %s by %s\n", song.getTitle(), song.getArtist());
@@ -753,12 +804,15 @@ public class LibraryView {
      * Displays all artists in the library.
      */
     private void displayLibraryArtists() {
+        // Get unique artists sorted A-Z
         List<String> artists = model.getArtistsSorted();
         
         if (artists.isEmpty()) {
-            System.out.println("\nYour library has no artists yet.");
+            System.out.println("\nYour library has no artists yet."); // Empty state
         } else {
-            System.out.println("\n=== Your Artists ===");
+            System.out.println("\n=== Your Artists ==="); // Section header
+            
+            // Simple list of artist names
             for (String artist : artists) {
                 System.out.println("- " + artist);
             }
@@ -767,21 +821,25 @@ public class LibraryView {
     
     
     /**
+     * AI generated!
      * Displays all songs in the library sorted by rating (ascending).
      */
     private void displaySongsByRating() {
+    	// Get songs sorted by rating then title
         List<Song> songs = model.getSongsSortedByRating();
         
         if (songs.isEmpty()) {
-            System.out.println("\nYour library has no songs yet.");
+            System.out.println("\nYour library has no songs yet."); // Empty state
         } else {
-            System.out.println("\n=== Songs by Rating ===");
+            System.out.println("\n=== Songs by Rating ==="); // Section header
+            
+            // Display each song with formatted rating
             for (Song song : songs) {
-                printSongWithRating(song);
+                printSongWithRating(song); // Consistent song display format
             }
         }
     }
-
+    
     // ================== PLAYLIST MANAGEMENT ================== //
 
     /**
@@ -832,15 +890,25 @@ public class LibraryView {
          }
      }
     
+    /**
+     * Shuffles and displays songs from a specified playlist.
+     */
     private void handleShufflePlaylist() {
+        // Get playlist name from user
         System.out.print("Enter playlist name: ");
         String playlistName = getUserInput();
+        
+        // Get shuffled songs from model
         List<Song> shuffledSongs = model.getShuffledPlaylistSongs(playlistName);
         
+        // Handle empty playlist case
         if (shuffledSongs.isEmpty()) {
             System.out.println("Playlist not found or is empty.");
-        } else {
+        } 
+        // Display shuffled songs
+        else {
             System.out.println("\n=== Shuffled Playlist: " + playlistName + " ===");
+            // Print each song with rating
             for (Song song : shuffledSongs) {
                 printSongWithRating(song);
             }
@@ -864,6 +932,7 @@ public class LibraryView {
      * Adds a song to a playlist.
      */
     private void addSongToPlaylist() {
+        // Get user input for playlist and song details
         System.out.print("Enter playlist name: ");
         String playlistName = getUserInput();
         System.out.print("Enter song title: ");
@@ -871,13 +940,13 @@ public class LibraryView {
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
+        // Retrieve playlist and song from model
         Playlist playlist = model.getPlaylistByName(playlistName);
-        // Searching for the song by title and artist
         Song song = model.searchSongByArtistAndTitle(artist, songTitle);
 
-        // Checking if both the playlist and song exist
+        // Verify both exist before adding
         if (playlist != null && song != null) {
-            playlist.addSong(song);
+            playlist.addSong(song);  // Add song to playlist
             System.out.println("Song added to playlist!");
         } else {
             System.out.println("Playlist or song not found.");
@@ -888,6 +957,7 @@ public class LibraryView {
      * Removes a song from a playlist.
      */
     private void removeSongFromPlaylist() {
+        // Get user input for playlist and song details
         System.out.print("Enter playlist name: ");
         String playlistName = getUserInput();
         System.out.print("Enter song title: ");
@@ -895,13 +965,14 @@ public class LibraryView {
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
+        // Retrieve playlist and song from model
         Playlist playlist = model.getPlaylistByName(playlistName);
         Song song = model.searchSongByArtistAndTitle(artist, songTitle);
 
         if (playlist != null && song != null) {
-            // Check if the song is actually in the playlist
+            // Additional check if song exists in playlist
             if (playlist.getSongs().contains(song)) {
-                playlist.removeSong(song);
+                playlist.removeSong(song);  // Remove song from playlist
                 System.out.println("Song removed from playlist!");
             } else {
                 System.out.println("Song not found in the playlist.");
@@ -910,47 +981,52 @@ public class LibraryView {
             System.out.println("Playlist or song not found.");
         }
     }
-
+    
     /**
      * AI generated!
      * Displays all playlists in the library.
      */
     private void displayPlaylists() {
-        // Get user-created playlists
-        List<Playlist> userPlaylists = model.getPlaylists();
-        // Get system-generated playlists
-        List<Playlist> systemPlaylists = model.getAutoPlaylists();
+        // Retrieve all playlists from the model
+        List<Playlist> userPlaylists = model.getPlaylists();  // User-created playlists
+        List<Playlist> systemPlaylists = model.getAutoPlaylists();  // System-generated playlists
 
-        // Check if there are no playlists at all
+        // Check if there are no playlists available
         if (userPlaylists.isEmpty() && systemPlaylists.isEmpty()) {
             System.out.println("\nYou have no playlists yet.");
-            return;
+            return;  // Exit early if no playlists exist
         }
 
-        // Display user-created playlists
+        // Display user playlists section if they exist
         if (!userPlaylists.isEmpty()) {
-            System.out.println("\n=== User Playlists ===");
+            System.out.println("\n=== User Playlists ===");  // Section header
             for (Playlist playlist : userPlaylists) {
+                // Print playlist name and song count
                 System.out.printf("%s (%d songs):\n", playlist.getName(), playlist.getSongs().size());
+                
+                // Print each song in the playlist with optional rating stars
                 for (Song song : playlist.getSongs()) {
                     String ratingStars = "";
                     if (song.getRating() > 0) {
-                        ratingStars = " " + getRatingStars(song.getRating());
+                        ratingStars = " " + getRatingStars(song.getRating());  // Add visual rating if exists
                     }
                     System.out.printf(" - %s by %s%s\n", song.getTitle(), song.getArtist(), ratingStars);
                 }
             }
         }
 
-        // Display system-generated playlists
+        // Display system playlists section if they exist
         if (!systemPlaylists.isEmpty()) {
-            System.out.println("\n=== System Playlists ===");
+            System.out.println("\n=== System Playlists ===");  // Section header
             for (Playlist playlist : systemPlaylists) {
+                // Print playlist name and song count
                 System.out.printf("%s (%d songs):\n", playlist.getName(), playlist.getSongs().size());
+                
+                // Print each song in the playlist with optional rating stars
                 for (Song song : playlist.getSongs()) {
                     String ratingStars = "";
                     if (song.getRating() > 0) {
-                        ratingStars = " " + getRatingStars(song.getRating());
+                        ratingStars = " " + getRatingStars(song.getRating());  // Add visual rating if exists
                     }
                     System.out.printf(" - %s by %s%s\n", song.getTitle(), song.getArtist(), ratingStars);
                 }
@@ -958,14 +1034,20 @@ public class LibraryView {
         }
     }
     
+    /**
+     * Displays a summary of automatically generated playlists.
+     */
     private void displayAutoPlaylists() {
-        // Get the auto playlists from the model
+        // Get playlist info (name and song count) from the auto playlist manager
         Map<String, Integer> autoPlaylists = model.getAutoPlaylistManager().getAutoPlaylistInfo();
 
+        // Handle case when no auto playlists exist
         if (autoPlaylists.isEmpty()) {
             System.out.println("\nNo auto playlists available.");
         } else {
-            System.out.println("\n=== Auto Playlists ===");
+            System.out.println("\n=== Auto Playlists ===");  // Section header
+            
+            // Print each playlist name and its song count
             for (Map.Entry<String, Integer> entry : autoPlaylists.entrySet()) {
                 System.out.printf("- %s: %d songs\n", entry.getKey(), entry.getValue());
             }
@@ -1010,19 +1092,22 @@ public class LibraryView {
      * Handles marking a song as a favorite.
      */
     private void handleMarkAsFavorite() {
+        // Get song details from user
         System.out.print("\nEnter song title: ");
         String title = getUserInput();
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
+        // Search for song in library
         Song song = model.searchSongByArtistAndTitle(artist, title);
         if (song == null) {
             System.out.println("Song not found in your library.");
-            return;
+            return;  // Exit if song doesn't exist
         }
 
+        // Mark song as favorite in the model
         model.markAsFavorite(song);
-        System.out.println("★ Song marked as favorite!");
+        System.out.println("★ Song marked as favorite!");  // Visual confirmation
     }
 
     // ================== HELPER METHODS ================== //
@@ -1041,9 +1126,11 @@ public class LibraryView {
      * @param results The results to display (List or single object).
      */
     public void displaySearchResults(Object results) {
+        // Handle list results
         if (results instanceof List) {
         	// Casting results to a generic List
             List<?> items = (List<?>) results;
+            // Check for empty results
             if (items.isEmpty()) {
                 System.out.println("No results found.");
                 return;
@@ -1056,8 +1143,10 @@ public class LibraryView {
                     Song song = (Song) item;
                     String ratingStars = "";
                     if (song.getRating() > 0) {
+                    	// Add star rating if exists
                         ratingStars = " " + getRatingStars(song.getRating());
                     }
+                    // Print song with album info and rating
                     System.out.printf("- %s by %s (Album: %s)%s\n",
                         song.getTitle(), song.getArtist(), song.getAlbum().getTitle(), ratingStars);
                 }
@@ -1074,6 +1163,7 @@ public class LibraryView {
                     for (Song song : album.getSongs()) {
                         String ratingStars = "";
                         if (song.getRating() > 0) {
+                        	// Add star rating if exists
                             ratingStars = " " + getRatingStars(song.getRating());
                         }
                         System.out.printf(" - %s%s\n", song.getTitle(), ratingStars);
@@ -1087,17 +1177,20 @@ public class LibraryView {
      * Handles song rating operations (renamed from handleRatingMenu).
      */
     private void handleSongRating() {
+        // Get song details from user
         System.out.print("\nEnter song title: ");
         String title = getUserInput();
         System.out.print("Enter artist: ");
         String artist = getUserInput();
 
+        // Search for song in library
         Song song = model.searchSongByArtistAndTitle(artist, title);
         if (song == null) {
             System.out.println("Song not found in your library.");
-            return;
+            return; // Exit if song doesn't exist
         }
 
+        // Get and validate rating
         System.out.print("Enter rating (1-5): ");
         try {
             int rating = Integer.parseInt(getUserInput());
@@ -1105,7 +1198,9 @@ public class LibraryView {
                 System.out.println("Invalid rating. Please enter a number between 1 and 5.");
                 return;
             }
+            // Update rating in model
             model.rateSong(song, rating);
+            // Special message for 5-star (favorite) ratings
             System.out.println(rating == 5 ? "★ Favorite added!" : "Rating updated!");
         } catch (NumberFormatException e) {
             System.out.println("Invalid rating. Must be a number between 1 and 5.");
@@ -1124,6 +1219,7 @@ public class LibraryView {
         StringBuilder stars = new StringBuilder();
         for (int i = 1; i <= 5; i++) {
             if (i <= rating) {
+            	 // Filled star for rating, empty for remainder
                 stars.append("★");
             } else {
                 stars.append("☆");
@@ -1139,6 +1235,7 @@ public class LibraryView {
     private void printSongWithRating(Song song) {
         String ratingStars = "";
         if (song.getRating() > 0) {
+        	// Add stars if rated
             ratingStars = " " + getRatingStars(song.getRating());
         }
         // Printing  song details in the specified format

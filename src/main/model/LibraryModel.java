@@ -85,7 +85,6 @@ public class LibraryModel {
                     }
                 }
             }
-
             // Update auto playlists
             autoPlaylistManager.updateAutoPlaylists(this);
         }
@@ -324,7 +323,7 @@ public class LibraryModel {
      * @return A list of playlists.
      */
     public List<Playlist> getPlaylists() {
-        return new ArrayList<>(playlists);
+        return Collections.unmodifiableList(new ArrayList<>(playlists));
     }
 
     /**
@@ -399,7 +398,9 @@ public class LibraryModel {
      * @return A list of system-generated playlists.
      */
     public List<Playlist> getAutoPlaylists() {
-        return autoPlaylistManager.getAutoPlaylists();
+        return Collections.unmodifiableList(
+            new ArrayList<>(autoPlaylistManager.getAutoPlaylists())
+        );
     }
 
     
@@ -458,10 +459,15 @@ public class LibraryModel {
     
     
     /**
-     * Returns a list of all songs in the library sorted by title (ascending), then by artist (ascending).
+     * Returns all library songs sorted by title (A-Z) then artist (A-Z).
+     * Case-insensitive comparison.
+     * 
+     * @return List of songs in sorted order
      */
     public List<Song> getSongsSortedByTitleAndArtist() {
+        // Create modifiable copy of song library
         List<Song> sorted = new ArrayList<>(songLibrary);
+        // Sort by title then artist (case-insensitive)
         sorted.sort(Comparator
             .comparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER)
             .thenComparing(Song::getArtist, String.CASE_INSENSITIVE_ORDER));
@@ -469,41 +475,60 @@ public class LibraryModel {
     }
 
     /**
-     * Returns a list of all albums in the library sorted by title (ascending).
+     * Returns all library albums sorted by title (A-Z).
+     * Case-insensitive comparison.
+     * 
+     * @return List of albums in sorted order
      */
     public List<Album> getAlbumsSortedByTitle() {
+        // Create modifiable copy of album library
         List<Album> sorted = new ArrayList<>(albumLibrary);
+        // Sort by title (case-insensitive)
         sorted.sort(Comparator.comparing(Album::getTitle, String.CASE_INSENSITIVE_ORDER));
         return sorted;
     }
 
     /**
-     * Returns a list of all artists in the library sorted alphabetically (ascending).
+     * Returns all unique artists sorted alphabetically (A-Z).
+     * Case-insensitive comparison.
+     * 
+     * @return List of artists in sorted order
      */
     public List<String> getArtistsSorted() {
-        List<String> artists = getArtists(); // Reuse existing method to get unique artists
+        // Get unique artists from existing method
+        List<String> artists = getArtists();
+        // Sort alphabetically (case-insensitive)
         artists.sort(String.CASE_INSENSITIVE_ORDER);
         return artists;
     }
 
     /**
-     * Returns a list of all songs in the library sorted by rating (ascending), then by title (ascending).
+     * Returns all library songs sorted by rating (1-5) then title (A-Z).
+     * Lowest ratings appear first.
+     * 
+     * @return List of songs in sorted order
      */
     public List<Song> getSongsSortedByRating() {
+        // Create modifiable copy of song library
         List<Song> sorted = new ArrayList<>(songLibrary);
+        // Sort by rating then title
         sorted.sort(Comparator
             .comparingInt(Song::getRating)
             .thenComparing(Song::getTitle, String.CASE_INSENSITIVE_ORDER));
         return sorted;
     }
-    
-    
+
     /**
-     * Returns a shuffled list of all songs in the library.
+     * Returns all library songs in random order.
+     * Creates new shuffled list each call.
+     * 
+     * @return List of songs in random order
      */
     public List<Song> getShuffledSongs() {
+        // Create modifiable copy of song library
         List<Song> shuffledSongs = new ArrayList<>(songLibrary);
-        Collections.shuffle(shuffledSongs); // Shuffle the list
+        // Randomize song order
+        Collections.shuffle(shuffledSongs);
         return shuffledSongs;
     }
 
@@ -523,7 +548,13 @@ public class LibraryModel {
         return shuffledSongs;
     }
     
+    /**
+     * Returns a defensive copy of the AutoPlaylistManager.
+     * Uses copy constructor to create the new instance.
+     * 
+     * @return New AutoPlaylistManager copy
+     */
     public AutoPlaylistManager getAutoPlaylistManager() {
-        return this.autoPlaylistManager;
+        return new AutoPlaylistManager(this.autoPlaylistManager); // Copy constructor
     }
 }
