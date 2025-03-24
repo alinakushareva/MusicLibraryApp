@@ -37,6 +37,9 @@ public class PlaybackTracker {
             throw new IllegalArgumentException("Song cannot be null.");
         }
 
+        // Remove the song from the recently played deque if it already exists
+        recentlyPlayed.remove(song);
+
         // Add the song to the recently played deque
         if (recentlyPlayed.size() >= RECENTLY_PLAYED_LIMIT) {
             recentlyPlayed.removeLast(); // Remove the oldest song if the limit is reached
@@ -82,7 +85,7 @@ public class PlaybackTracker {
      * @return A map where the key is the song and the value is the number of times it has been played.
      */
     public Map<Song, Integer> getPlayCounts() {
-        return playCounts;
+    	return Collections.unmodifiableMap(playCounts);
     }
 
     // ================== SAVE/LOAD PLAYBACK DATA ================== //

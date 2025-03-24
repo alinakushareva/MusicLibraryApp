@@ -420,4 +420,157 @@ class LibraryModelTest {
         MusicStore retrievedMusicStore = libraryModel.getMusicStore();
         assertSame(musicStore, retrievedMusicStore);
     }
+
+
+ // ================== SORTING AND SHUFFLING ================== //
+
+    @Test
+    void testGetSongsSortedByTitleAndArtist() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album1 = new Album("Test Album 1", "Artist B", "Pop", 2020);
+        Song song1 = new Song("Banana", "Artist B", album1);
+        Song song2 = new Song("Apple", "Artist A", album1);
+        libraryModel.addAlbumDirect(new Album("Test Album", "Artist", "Pop", 2020, List.of(song1, song2)));
+
+        List<Song> sortedSongs = libraryModel.getSongsSortedByTitleAndArtist();
+        assertEquals("Apple", sortedSongs.get(0).getTitle());
+        assertEquals("Banana", sortedSongs.get(1).getTitle());
+    }
+
+    @Test
+    void testGetAlbumsSortedByTitle() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album1 = new Album("Banana Album", "Artist B", "Pop", 2020);
+        Album album2 = new Album("Apple Album", "Artist A", "Rock", 2019);
+        libraryModel.addAlbumDirect(album1);
+        libraryModel.addAlbumDirect(album2);
+
+        List<Album> sortedAlbums = libraryModel.getAlbumsSortedByTitle();
+        assertEquals("Apple Album", sortedAlbums.get(0).getTitle());
+        assertEquals("Banana Album", sortedAlbums.get(1).getTitle());
+    }
+
+
+    @Test
+    void testGetSongsSortedByRating() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = new Album("Test Album", "Test Artist", "Pop", 2020);
+        Song song1 = new Song("Song 1", "Test Artist", album);
+        Song song2 = new Song("Song 2", "Test Artist", album);
+        song1.rate(3);
+        song2.rate(5);
+        libraryModel.addAlbumDirect(new Album("Test Album", "Test Artist", "Pop", 2020, List.of(song1, song2)));
+
+        List<Song> sortedSongs = libraryModel.getSongsSortedByRating();
+        assertEquals(3, sortedSongs.get(0).getRating());
+        assertEquals(5, sortedSongs.get(1).getRating());
+    }
+
+    @Test
+    void testGetShuffledSongs() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19");
+        libraryModel.addAlbum(album);
+        List<Song> originalOrder = List.copyOf(libraryModel.getSongLibrary());
+
+        List<Song> shuffledSongs = libraryModel.getShuffledSongs();
+        assertEquals(originalOrder.size(), shuffledSongs.size());
+        assertTrue(shuffledSongs.containsAll(originalOrder));
+    }
+
+    @Test
+    void testGetShuffledPlaylistSongs() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19");
+        libraryModel.addAlbum(album);
+        Playlist playlist = libraryModel.createPlaylist("Test Playlist");
+        playlist.addSong(album.getSongs().get(0));
+        playlist.addSong(album.getSongs().get(1));
+
+        List<Song> shuffled = libraryModel.getShuffledPlaylistSongs("Test Playlist");
+        assertEquals(2, shuffled.size());
+    }
+
+    @Test
+    void testGetShuffledPlaylistSongs_NonExistentPlaylist() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> result = libraryModel.getShuffledPlaylistSongs("Nonexistent");
+        assertTrue(result.isEmpty());
+    }
+
+    // ================== AUTO PLAYLISTS AND FAVORITES ================== //
+
+    @Test
+    void testMarkAsFavorite() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19");
+        libraryModel.addAlbum(album);
+        Song song = album.getSongs().get(0);
+
+        libraryModel.markAsFavorite(song);
+        assertTrue(song.isFavorite());
+    }
+
+    @Test
+    void testGetAutoPlaylists() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19");
+        libraryModel.addAlbum(album);
+        libraryModel.rateSong(album.getSongs().get(0), 5);
+
+        List<Playlist> autoPlaylists = libraryModel.getAutoPlaylists();
+        assertFalse(autoPlaylists.isEmpty());
+    }
+
+    // ================== GENRE SEARCH ================== //
+
+    @Test
+    void testSearchSongByGenre() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19"); // Adele's album is Pop
+        libraryModel.addAlbum(album);
+
+        List<Song> popSongs = libraryModel.searchSongByGenre("Pop");
+        assertFalse(popSongs.isEmpty());
+    }
+
+    @Test
+    void testSearchSongByGenre_NonExistent() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        List<Song> result = libraryModel.searchSongByGenre("Nonexistent");
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testSearchSongByGenre_CaseInsensitive() {
+        MusicStore musicStore = new MusicStore("src/main/albums");
+        LibraryModel libraryModel = new LibraryModel(musicStore);
+
+        Album album = musicStore.getAlbumByTitle("19");
+        libraryModel.addAlbum(album);
+
+        List<Song> lowerCase = libraryModel.searchSongByGenre("pop");
+        List<Song> upperCase = libraryModel.searchSongByGenre("POP");
+        assertEquals(lowerCase.size(), upperCase.size());
+    }
 }

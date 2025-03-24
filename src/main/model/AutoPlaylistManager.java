@@ -48,13 +48,8 @@ public class AutoPlaylistManager {
             }
         }
         autoPlaylists.put("Top Rated", topRatedPlaylist);
-
-        // Log auto playlists
-        System.out.println("\n=== Auto Playlists ===");
-        for (Map.Entry<String, Playlist> entry : autoPlaylists.entrySet()) {
-            System.out.printf("- %s: %d songs\n", entry.getKey(), entry.getValue().getSongs().size());
-        }
     }
+
 
 
     /**
@@ -64,5 +59,19 @@ public class AutoPlaylistManager {
      */
     public List<Playlist> getAutoPlaylists() {
         return new ArrayList<>(autoPlaylists.values());
+    }
+    
+    /**
+     * Returns a map of auto playlists with their names and sizes.
+     * This is used by the view to display the playlists.
+     * 
+     * @return A map where the key is the playlist name and the value is the number of songs.
+     */
+    public Map<String, Integer> getAutoPlaylistInfo() {
+        Map<String, Integer> playlistInfo = new HashMap<>();
+        for (Map.Entry<String, Playlist> entry : autoPlaylists.entrySet()) {
+            playlistInfo.put(entry.getKey(), entry.getValue().getSongs().size());
+        }
+        return playlistInfo;
     }
 }

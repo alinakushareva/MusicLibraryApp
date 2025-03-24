@@ -791,42 +791,46 @@ public class LibraryView {
     private void handlePlaylistMenu() {
         while (true) {
             // Display the playlist management menu options
-        	System.out.println("\n=== Playlist Management ===");
-            System.out.println("1. Create Playlist");
-            System.out.println("2. Add Song to Playlist");
-            System.out.println("3. Remove Song from Playlist");
-            System.out.println("4. View Playlists");
-            System.out.println("5. Shuffle Playlist"); 
-            System.out.println("6. Return to Main Menu");
-            System.out.print("Enter choice: ");
+        	 System.out.println("1. Create Playlist");
+             System.out.println("2. Add Song to Playlist");
+             System.out.println("3. Remove Song from Playlist");
+             System.out.println("4. View Playlists");
+             System.out.println("5. View Auto Playlists"); 
+             System.out.println("6. Shuffle Playlist");
+             System.out.println("7. Return to Main Menu");
+             System.out.print("Enter choice: ");
 
-            try {
-                int choice = Integer.parseInt(getUserInput());
-                switch (choice) {
-                    case 1:
-                        createPlaylist(); // Create a new playlist
-                        break;
-                    case 2:
-                        addSongToPlaylist(); // Add a song to an existing playlist
-                        break;
-                    case 3:
-                        removeSongFromPlaylist(); // Remove a song from a playlist
-                        break;
-                    case 4:
-                        displayPlaylists(); // Display all available playlists
-                        break;
-                    case 5:
-                        handleShufflePlaylist();
-                    case 6:
-                        return; // Exit the menu and return to the main menu
-                    default:
-                        System.out.println("Invalid choice. Try again.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
-        }
-    }
+             try {
+                 int choice = Integer.parseInt(getUserInput());
+                 switch (choice) {
+                     case 1:
+                         createPlaylist(); // Create a new playlist
+                         break;
+                     case 2:
+                         addSongToPlaylist(); // Add a song to an existing playlist
+                         break;
+                     case 3:
+                         removeSongFromPlaylist(); // Remove a song from a playlist
+                         break;
+                     case 4:
+                         displayPlaylists(); // Display all available playlists
+                         break;
+                     case 5:
+                         displayAutoPlaylists(); // Display auto playlists
+                         break;
+                     case 6:
+                         handleShufflePlaylist(); // Shuffle a playlist
+                         break;
+                     case 7:
+                         return; // Exit the menu and return to the main menu
+                     default:
+                         System.out.println("Invalid choice. Try again.");
+                 }
+             } catch (NumberFormatException e) {
+                 System.out.println("Invalid input. Please enter a number.");
+             }
+         }
+     }
     
     private void handleShufflePlaylist() {
         System.out.print("Enter playlist name: ");
@@ -950,6 +954,20 @@ public class LibraryView {
                     }
                     System.out.printf(" - %s by %s%s\n", song.getTitle(), song.getArtist(), ratingStars);
                 }
+            }
+        }
+    }
+    
+    private void displayAutoPlaylists() {
+        // Get the auto playlists from the model
+        Map<String, Integer> autoPlaylists = model.getAutoPlaylistManager().getAutoPlaylistInfo();
+
+        if (autoPlaylists.isEmpty()) {
+            System.out.println("\nNo auto playlists available.");
+        } else {
+            System.out.println("\n=== Auto Playlists ===");
+            for (Map.Entry<String, Integer> entry : autoPlaylists.entrySet()) {
+                System.out.printf("- %s: %d songs\n", entry.getKey(), entry.getValue());
             }
         }
     }

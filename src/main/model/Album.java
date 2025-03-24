@@ -51,7 +51,7 @@ public class Album {
         this.artist = artist;
         this.genre = genre;
         this.year = year;
-        this.songs = new ArrayList<>(songs); // Initialize with the provided list of songs
+        this.songs = new ArrayList<>(songs); 
     }
     
     /* 

@@ -1,4 +1,24 @@
 {
-    "recentlyPlayed": [],
-    "playCounts": {}
+    "recentlyPlayed": [
+        "Tired",
+        "My Same",
+        "Hometown Glory",
+        "Crazy for You",
+        "Crazy for You",
+        "Cold Shoulder",
+        "Chasing Pavements",
+        "Best for Last",
+        "Daydreamer",
+        "Daydreamer"
+    ],
+    "playCounts": {
+        "Best for Last": 1,
+        "Hometown Glory": 1,
+        "Daydreamer": 3,
+        "Cold Shoulder": 1,
+        "Tired": 1,
+        "Chasing Pavements": 1,
+        "Crazy for You": 2,
+        "My Same": 1
+    }
 }

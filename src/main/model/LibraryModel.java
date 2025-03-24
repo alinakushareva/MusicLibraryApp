@@ -81,7 +81,7 @@ public class LibraryModel {
                 } else {
                     // If the album exists, add the song to the existing album (if it's not already there)
                     if (!libraryAlbum.getSongs().contains(song)) {
-                        libraryAlbum.getSongs().add(song);
+                        libraryAlbum.addSong(song);
                     }
                 }
             }
@@ -521,5 +521,9 @@ public class LibraryModel {
         List<Song> shuffledSongs = new ArrayList<>(playlist.getSongs());
         Collections.shuffle(shuffledSongs); // Shuffle the list
         return shuffledSongs;
+    }
+    
+    public AutoPlaylistManager getAutoPlaylistManager() {
+        return this.autoPlaylistManager;
     }
 }
