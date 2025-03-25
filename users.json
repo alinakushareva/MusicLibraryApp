@@ -1,0 +1,32 @@
+[
+    {
+        "salt": "Aw6pp3eaWUFTvvAOUteg7w==",
+        "hashedPassword": "ZaLrj4deKrY5XqOdsckQHg==",
+        "username": "1"
+    },
+    {
+        "salt": "NwFexUtY4cYJ/tYW+GI2yQ==",
+        "hashedPassword": "g+D/IsRjn9SvlfhbXqiCNQ==",
+        "username": "2"
+    },
+    {
+        "salt": "No52xPqga75t/mXwdTAmWA==",
+        "hashedPassword": "rabKPwpZb6DZWXl5yW81xg==",
+        "username": "bob"
+    },
+    {
+        "salt": "f3DHwmVi/GWTCpNuQTruiw==",
+        "hashedPassword": "zpsvVGH0aSX8h/4ZqLd79g==",
+        "username": "u"
+    },
+    {
+        "salt": "0FEOq6qGOKQWAIncZaCV0A==",
+        "hashedPassword": "IU8QKXOra11ASJM6hJZpnA==",
+        "username": "alice"
+    },
+    {
+        "salt": "Kmyj1e6WG1fIeEbydcd8Hw==",
+        "hashedPassword": "jHia6JCqa+DX887JPCprAQ==",
+        "username": "username"
+    }
+]
