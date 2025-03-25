@@ -108,4 +108,44 @@ class AutoPlaylistManagerTest {
         assertEquals("Favorite Songs", playlists.get(0).getName());
         assertEquals("Top Rated", playlists.get(1).getName());
     }
+    
+    @Test
+    void testCopyConstructorWithNullOriginal() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AutoPlaylistManager(null);
+        }, "Should throw exception when original is null");
+    }
+
+    @Test
+    void testCopyConstructorWithEmptyPlaylists() {
+        // Setup original with empty playlists
+        AutoPlaylistManager original = new AutoPlaylistManager();
+        original.updateAutoPlaylists(new LibraryModel(store)); // Creates empty playlists
+        
+        // Create copy
+        AutoPlaylistManager copy = new AutoPlaylistManager(original);
+        
+        // Verify empty playlists were copied
+        assertEquals(2, copy.getAutoPlaylists().size());
+        assertEquals(0, copy.getAutoPlaylistInfo().get("Favorite Songs"));
+        assertEquals(0, copy.getAutoPlaylistInfo().get("Top Rated"));
+    }
+
+    
+
+    @Test
+    void testCopyConstructorMaintainsPlaylistOrder() {
+        // Setup original
+        AutoPlaylistManager original = new AutoPlaylistManager();
+        LibraryModel library = new LibraryModel(store);
+        original.updateAutoPlaylists(library);
+        
+        // Create copy
+        AutoPlaylistManager copy = new AutoPlaylistManager(original);
+        
+        // Verify playlist order is maintained
+        List<Playlist> playlists = copy.getAutoPlaylists();
+        assertEquals("Favorite Songs", playlists.get(0).getName());
+        assertEquals("Top Rated", playlists.get(1).getName());
+    }
 }
